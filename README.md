@@ -1,2 +1,2 @@
 # helm-charts
-Private Helm chart repo
+Self-baked Helm charts
