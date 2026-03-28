@@ -1,0 +1,43 @@
+name: Rebuild Index
+
+# Manual escape hatch: rebuilds index.yaml on gh-pages from all existing
+# GitHub Releases. Use if a release workflow fails after creating the release
+# but before updating the index (leaving an orphaned release with no index entry).
+on:
+  workflow_dispatch:
+
+jobs:
+  rebuild-index:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Install chart-releaser
+        run: |
+          CR_VERSION="1.6.1"
+          curl -sSLo /tmp/cr.tar.gz \
+            "https://github.com/helm/chart-releaser/releases/download/v${CR_VERSION}/chart-releaser_${CR_VERSION}_linux_amd64.tar.gz"
+          tar -xzf /tmp/cr.tar.gz -C /tmp cr
+          sudo mv /tmp/cr /usr/local/bin/cr
+
+      - name: Rebuild index from all GitHub Releases
+        run: |
+          cr index \
+            --owner "${{ github.repository_owner }}" \
+            --repo "$(basename ${{ github.repository }})" \
+            --charts-repo "https://${{ github.repository_owner }}.github.io/$(basename ${{ github.repository }})" \
+            --pages-branch gh-pages \
+            --token "${{ secrets.GITHUB_TOKEN }}" \
+            --push
