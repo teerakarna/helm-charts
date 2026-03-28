@@ -1,0 +1,31 @@
+Gonymizer is configured to run: {{ .Values.command | upper }}
+
+Workload: {{ .Values.workloadType | upper }}
+{{- if eq .Values.workloadType "cronjob" }}
+Schedule: {{ .Values.schedule }}
+
+Trigger a run immediately:
+  kubectl create job --from=cronjob/{{ include "gonymizer.fullname" . }} \
+    {{ include "gonymizer.fullname" . }}-manual \
+    -n {{ .Release.Namespace }}
+{{- end }}
+
+Check run status:
+  kubectl get jobs -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }}
+
+View logs:
+  kubectl logs -n {{ .Release.Namespace }} \
+    -l app.kubernetes.io/instance={{ .Release.Name }} --tail=50
+
+Full anonymization pipeline (run each step as a separate job):
+  # 1. Dump PII data from source DB
+  helm install gon-dump teerakarna/gonymizer --set command=dump ...
+
+  # 2. Anonymize the dump
+  helm install gon-process teerakarna/gonymizer --set command=process ...
+
+  # 3. Load anonymized data into target DB
+  helm install gon-load teerakarna/gonymizer --set command=load ...
+
+Delete when done:
+  helm uninstall {{ .Release.Name }} --namespace {{ .Release.Namespace }}

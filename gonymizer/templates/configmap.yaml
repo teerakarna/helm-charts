@@ -1,0 +1,23 @@
+{{- if and .Values.mapFile.enabled (not .Values.mapFile.existingConfigMap) .Values.mapFile.content -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ printf "%s-mapfile" (include "gonymizer.fullname" .) }}
+  labels:
+    {{- include "gonymizer.labels" . | nindent 4 }}
+data:
+  {{ .Values.mapFile.contentKey }}: |
+    {{- .Values.mapFile.content | nindent 4 }}
+{{- end }}
+{{- if and .Values.configFile.enabled (not .Values.configFile.existingConfigMap) .Values.configFile.content }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ printf "%s-config" (include "gonymizer.fullname" .) }}
+  labels:
+    {{- include "gonymizer.labels" . | nindent 4 }}
+data:
+  {{ .Values.configFile.contentKey }}: |
+    {{- .Values.configFile.content | nindent 4 }}
+{{- end }}

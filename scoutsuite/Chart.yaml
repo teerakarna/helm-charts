@@ -1,0 +1,21 @@
+apiVersion: v2
+name: scoutsuite
+description: Multi-cloud security auditing tool (ScoutSuite by NCC Group). Runs as a CronJob or one-off Job to audit AWS, GCP, Azure, and other cloud providers, then writes an HTML report to a persistent volume.
+type: application
+version: 0.1.0
+appVersion: "5.14.0"
+keywords:
+  - scoutsuite
+  - security
+  - auditing
+  - aws
+  - gcp
+  - azure
+  - cloud
+home: https://github.com/teerakarna/helm-charts
+sources:
+  - https://github.com/teerakarna/helm-charts
+  - https://github.com/nccgroup/ScoutSuite
+maintainers:
+  - name: teerakarna
+    url: https://github.com/teerakarna

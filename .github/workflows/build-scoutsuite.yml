@@ -1,0 +1,56 @@
+name: Build ScoutSuite Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      scoutsuite_version:
+        description: "ScoutSuite release version to build (e.g. 5.14.0)"
+        required: true
+        default: "5.14.0"
+      push:
+        description: "Push the image to the registry"
+        type: boolean
+        required: true
+        default: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/scoutsuite
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        if: ${{ inputs.push }}
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: scoutsuite/docker
+          push: ${{ inputs.push }}
+          build-args: |
+            SCOUTSUITE_VERSION=${{ inputs.scoutsuite_version }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ inputs.scoutsuite_version }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          labels: |
+            org.opencontainers.image.version=${{ inputs.scoutsuite_version }}
+            org.opencontainers.image.revision=${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

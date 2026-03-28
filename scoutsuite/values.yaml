@@ -1,0 +1,176 @@
+# -- Cloud provider to audit.
+# Supported: aws | gcp | azure | aliyun | oci | kubernetes | do
+provider: aws
+
+# -- Workload type: cronjob | job
+workloadType: cronjob
+
+# -- CronJob schedule (used only when workloadType=cronjob).
+schedule: "0 2 * * *"
+
+# -- CronJob concurrency policy. Forbid prevents overlapping scans.
+concurrencyPolicy: Forbid
+
+# -- Number of failed CronJob runs to retain.
+failedJobsHistoryLimit: 3
+
+# -- Number of successful CronJob runs to retain.
+successfulJobsHistoryLimit: 1
+
+# -- Number of retries before marking the Job as failed.
+# 0 is recommended — a failed security scan should not silently retry.
+backoffLimit: 0
+
+# -- Maximum seconds a Job may run before being terminated (0 = no limit).
+activeDeadlineSeconds: 0
+
+image:
+  # -- Image repository. No official published image exists — build your own
+  # using the Dockerfile in scoutsuite/docker/ and the build-scoutsuite workflow.
+  repository: ghcr.io/teerakarna/scoutsuite
+  pullPolicy: IfNotPresent
+  # -- Image tag. Should match the ScoutSuite release version.
+  tag: "5.14.0"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  # -- Annotations added to the ServiceAccount.
+  # For AWS IRSA, add: eks.amazonaws.com/role-arn: arn:aws:iam::ACCOUNT:role/ROLE
+  # For GCP Workload Identity, add: iam.gke.io/gcp-service-account: SA@PROJECT.iam.gserviceaccount.com
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  # ScoutSuite writes its report to output.reportDir — that directory must be writable.
+  # Set to true only if reportDir is on a writable mounted volume and /tmp is not needed.
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+      - ALL
+
+# -- Provider authentication.
+# Only the block matching .Values.provider is used. All credentials must come
+# from an existing Kubernetes Secret — never put credential values in this file.
+auth:
+  aws:
+    # -- irsa: Use IRSA (recommended). Annotate serviceAccount with the IAM role ARN.
+    # -- accessKeys: Inject credentials from existingSecret as AWS SDK env vars.
+    mode: irsa
+    # -- Name of the Secret containing AWS credentials (required when mode=accessKeys).
+    existingSecret: ""
+    accessKeyIdKey: AWS_ACCESS_KEY_ID
+    secretAccessKeyKey: AWS_SECRET_ACCESS_KEY
+    # -- Optional session token key. Leave empty if not using temporary credentials.
+    sessionTokenKey: ""
+
+  gcp:
+    # -- workloadIdentity: Use GCP Workload Identity. Annotate serviceAccount.
+    # -- serviceAccount: Mount a service account key JSON from existingSecret.
+    mode: serviceAccount
+    # -- Name of the Secret containing the service account key JSON.
+    existingSecret: ""
+    keyFileKey: key.json
+    mountPath: /config/gcp/key.json
+    projectId: ""
+    organizationId: ""
+    folderId: ""
+    allProjects: false
+
+  azure:
+    # -- workloadIdentity: Use Azure Workload Identity / MSI (--msi flag, no credentials needed).
+    # -- servicePrincipal: Inject clientId, clientSecret, tenantId from existingSecret.
+    #    Credentials are referenced in container args as $(ENV_VAR) so they are not
+    #    visible in the pod spec, but are visible to the running process. This is the
+    #    unavoidable trade-off when the tool requires explicit CLI credential flags.
+    mode: workloadIdentity
+    # -- Name of the Secret containing Azure service principal credentials.
+    existingSecret: ""
+    clientIdKey: AZURE_CLIENT_ID
+    clientSecretKey: AZURE_CLIENT_SECRET
+    tenantIdKey: AZURE_TENANT_ID
+    subscriptionIds: []
+    allSubscriptions: false
+
+  aliyun:
+    # -- Name of the Secret containing Alibaba Cloud access key credentials.
+    existingSecret: ""
+    accessKeyIdKey: ALIYUN_ACCESS_KEY_ID
+    accessKeySecretKey: ALIYUN_ACCESS_KEY_SECRET
+
+  do:
+    # -- Name of the Secret containing the DigitalOcean API token.
+    existingSecret: ""
+    tokenKey: DO_TOKEN
+
+# -- Scan scope — applies to all providers.
+scout:
+  # -- Services to include (default: all). Example: [iam, s3, ec2]
+  services: []
+  # -- Services to skip. Example: [cloudtrail, guardduty]
+  skip: []
+  # -- Maximum number of concurrent API request threads.
+  maxWorkers: 10
+  # -- Maximum API requests per second. null = unlimited.
+  maxRate: null
+  # -- Ruleset file for analysis. default.json uses ScoutSuite's built-in rules.
+  ruleset: default.json
+  # -- Report output format: json | sqlite
+  resultFormat: json
+  # -- Append a UTC timestamp to the report name.
+  timestamp: true
+  # -- Overwrite existing report files.
+  force: true
+
+  # -- AWS-only: regions to scan (default: all).
+  regions: []
+  # -- AWS-only: regions to exclude.
+  excludedRegions: []
+  # -- AWS-only: IP range config files to load (paths inside the container).
+  ipRanges: []
+  ipRangesNameKey: name
+
+# -- Report output configuration.
+output:
+  # -- Directory inside the container where ScoutSuite writes its report.
+  # Should match persistence.mountPath when persistence is enabled.
+  reportDir: /reports
+  # -- Optional report name. Defaults to ScoutSuite's auto-generated name.
+  reportName: ""
+
+# -- Persistent storage for the generated report.
+persistence:
+  enabled: true
+  size: 1Gi
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  # -- Use an existing PVC instead of creating one.
+  existingClaim: ""
+  mountPath: /reports
+
+resources:
+  limits:
+    cpu: "1"
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

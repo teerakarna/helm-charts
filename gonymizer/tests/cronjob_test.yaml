@@ -1,0 +1,91 @@
+suite: cronjob
+templates:
+  - cronjob.yaml
+tests:
+  - it: should create a CronJob by default
+    asserts:
+      - isKind:
+          of: CronJob
+      - equal:
+          path: spec.schedule
+          value: "0 3 * * 0"
+      - equal:
+          path: spec.concurrencyPolicy
+          value: Forbid
+      - equal:
+          path: spec.jobTemplate.spec.backoffLimit
+          value: 0
+
+  - it: should not create a CronJob when workloadType=job
+    set:
+      workloadType: job
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should include the subcommand in args
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args
+          content: dump
+
+  - it: should include the process subcommand when set
+    set:
+      command: process
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args
+          content: process
+
+  - it: should set restartPolicy to Never
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.restartPolicy
+          value: Never
+
+  - it: should enforce security context
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.securityContext.runAsNonRoot
+          value: true
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation
+          value: false
+
+  - it: should never include password in args
+    set:
+      source.host: mydb.example.com
+      source.database: mydb
+      source.username: myuser
+      source.existingSecret: db-secret
+    asserts:
+      - notContains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args
+          content: --password
+
+  - it: should inject DB password as env var not in args
+    set:
+      source.existingSecret: db-secret
+      source.passwordKey: password
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env[0].name
+          value: GON_DUMP_PASSWORD
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.name
+          value: db-secret
+
+  - it: should use load password env var for load command
+    set:
+      command: load
+      target.existingSecret: db-secret
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env[0].name
+          value: GON_LOAD_PASSWORD
+
+  - it: should mount PVC when persistence is enabled
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.volumes[0].persistentVolumeClaim.claimName
+          value: RELEASE-NAME-gonymizer

@@ -1,0 +1,90 @@
+suite: cronjob
+templates:
+  - cronjob.yaml
+tests:
+  - it: should create a CronJob by default
+    asserts:
+      - isKind:
+          of: CronJob
+      - equal:
+          path: spec.schedule
+          value: "0 2 * * *"
+      - equal:
+          path: spec.concurrencyPolicy
+          value: Forbid
+      - equal:
+          path: spec.jobTemplate.spec.backoffLimit
+          value: 0
+
+  - it: should not create a CronJob when workloadType=job
+    set:
+      workloadType: job
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should include the provider as the first arg
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args[0]
+          value: aws
+
+  - it: should always include --no-browser
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args
+          content: --no-browser
+
+  - it: should always include --report-dir
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args
+          content: --report-dir
+
+  - it: should set restartPolicy to Never
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.restartPolicy
+          value: Never
+
+  - it: should enforce security context by default
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.securityContext.runAsNonRoot
+          value: true
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation
+          value: false
+
+  - it: should mount PVC when persistence is enabled
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.volumes[0].persistentVolumeClaim.claimName
+          value: RELEASE-NAME-scoutsuite
+
+  - it: should use emptyDir when persistence is disabled
+    set:
+      persistence.enabled: false
+    asserts:
+      - exists:
+          path: spec.jobTemplate.spec.template.spec.volumes[0].emptyDir
+
+  - it: should not include auth env vars for AWS IRSA mode
+    asserts:
+      - notExists:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env
+
+  - it: should inject AWS credentials env vars when mode=accessKeys
+    set:
+      auth.aws.mode: accessKeys
+      auth.aws.existingSecret: my-aws-secret
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env[0].name
+          value: AWS_ACCESS_KEY_ID
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.name
+          value: my-aws-secret
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env[1].name
+          value: AWS_SECRET_ACCESS_KEY

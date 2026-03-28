@@ -1,0 +1,48 @@
+suite: job
+templates:
+  - job.yaml
+tests:
+  - it: should not create a Job by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should create a Job when workloadType=job
+    set:
+      workloadType: job
+    asserts:
+      - isKind:
+          of: Job
+      - equal:
+          path: spec.backoffLimit
+          value: 0
+
+  - it: should set restartPolicy to Never for Job
+    set:
+      workloadType: job
+    asserts:
+      - equal:
+          path: spec.template.spec.restartPolicy
+          value: Never
+
+  - it: should include the provider as the first arg in Job
+    set:
+      workloadType: job
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].args[0]
+          value: aws
+
+  - it: should set GCP provider in Job
+    set:
+      workloadType: job
+      provider: gcp
+      auth.gcp.mode: serviceAccount
+      auth.gcp.existingSecret: gcp-key-secret
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].args[0]
+          value: gcp
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --service-account

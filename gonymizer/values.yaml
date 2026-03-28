@@ -1,0 +1,192 @@
+# -- Gonymizer subcommand to run: map | dump | process | load | upload
+# Run one command per Job/CronJob. Chain multiple jobs to build a full pipeline.
+command: dump
+
+# -- Workload type: cronjob | job
+workloadType: cronjob
+
+# -- CronJob schedule (used only when workloadType=cronjob).
+schedule: "0 3 * * 0"
+
+# -- CronJob concurrency policy. Forbid prevents overlapping anonymization runs.
+concurrencyPolicy: Forbid
+
+# -- Number of failed CronJob runs to retain.
+failedJobsHistoryLimit: 3
+
+# -- Number of successful CronJob runs to retain.
+successfulJobsHistoryLimit: 1
+
+# -- Number of retries before marking the Job as failed.
+# 0 is recommended — partial retries on a data operation can produce inconsistent output.
+backoffLimit: 0
+
+# -- Maximum seconds a Job may run before being terminated (0 = no limit).
+activeDeadlineSeconds: 0
+
+image:
+  repository: smithoss/gonymizer
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  # -- Annotations added to the ServiceAccount.
+  # For S3 upload via IRSA, add: eks.amazonaws.com/role-arn: arn:aws:iam::ACCOUNT:role/ROLE
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65534
+  runAsGroup: 65534
+  fsGroup: 65534
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  # Gonymizer writes dump and processed files — those paths must be on writable volumes.
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+      - ALL
+
+# -- Source database connection (used by: map, dump).
+# Credentials must come from an existing Kubernetes Secret — never put passwords here.
+source:
+  host: ""
+  port: 5432
+  database: ""
+  username: ""
+  disableSSL: false
+  # -- Secret containing the database password.
+  # Injected as GON_DUMP_PASSWORD (for dump) or GON_MAP_PASSWORD (for map) env var.
+  # Gonymizer's Viper config picks these up automatically via the GON_ prefix.
+  existingSecret: ""
+  passwordKey: password
+
+# -- Target database connection (used by: load).
+target:
+  host: ""
+  port: 5432
+  database: ""
+  username: ""
+  disableSSL: false
+  # -- Secret containing the database password.
+  # Injected as GON_LOAD_PASSWORD env var.
+  existingSecret: ""
+  passwordKey: password
+
+# -- Map file defining column-level anonymization rules (used by: dump, process).
+# The map file is mounted from a ConfigMap.
+mapFile:
+  enabled: false
+  # -- Inline map file content (JSON). Creates a ConfigMap from this content.
+  content: ""
+  # -- Use an existing ConfigMap instead of creating one.
+  existingConfigMap: ""
+  # -- Key within the ConfigMap that contains the map file content.
+  contentKey: map.json
+  mountPath: /config/map.json
+
+# -- Optional Viper config file (YAML/JSON/TOML).
+# Useful for supplying non-sensitive defaults without setting every CLI flag.
+# Sensitive values (passwords) must still come from existingSecret, not this file.
+configFile:
+  enabled: false
+  content: ""
+  existingConfigMap: ""
+  contentKey: gonymizer.yaml
+  mountPath: /config/gonymizer.yaml
+
+# -- File paths for dump and process intermediate files.
+# These paths must be inside persistence.mountPath or an emptyDir.
+files:
+  dumpFile: /data/dump.sql
+  processedFile: /data/processed.sql
+  # -- Optional: path for the row count CSV produced by dump.
+  rowCountFile: ""
+  # -- Optional: SQL script to run before process.
+  preProcessFile: ""
+  # -- Optional: SQL script to run after process.
+  postProcessFile: ""
+
+# -- Persistent storage for intermediate dump files.
+# Disable and use emptyDir if all steps run in a single pod (command chaining not needed).
+persistence:
+  enabled: true
+  size: 5Gi
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  existingClaim: ""
+  mountPath: /data
+
+# -- Options specific to the dump command.
+dump:
+  # -- Schemas to include. Example: [public, app]
+  schema: []
+  # -- Schema prefix for grouped/sharded schemas. Example: tenant_
+  schemaPrefix: ""
+  # -- Tables to exclude from the dump.
+  excludeTable: []
+  # -- Tables whose data should be excluded (schema only).
+  excludeTableData: []
+  # -- Schemas to exclude DROP/CREATE for (useful when using schemaPrefix).
+  excludeSchema: []
+  # -- Enable --oids for older pg_dump versions.
+  oids: false
+
+# -- Options specific to the process command.
+process:
+  generateSeed: false
+  inclusive: false
+
+# -- Options specific to the load command.
+load:
+  # -- Skip stored procedures when loading.
+  skipProcedures: false
+
+# -- Options specific to the upload command.
+upload:
+  # -- Path to the local file to upload to S3.
+  localFile: ""
+  # -- S3 destination path (s3://bucket/prefix/file).
+  s3File: ""
+
+# -- AWS S3 credentials (used by the upload command).
+# Prefer IRSA — annotate serviceAccount with the IAM role ARN and set useIRSA: true.
+s3:
+  useIRSA: true
+  # -- Secret containing AWS credentials for S3 (only if useIRSA: false).
+  existingSecret: ""
+  accessKeyIdKey: AWS_ACCESS_KEY_ID
+  secretAccessKeyKey: AWS_SECRET_ACCESS_KEY
+
+# -- Logging configuration.
+logging:
+  # -- Log level: TRACE | DEBUG | INFO | WARN | ERROR | FATAL
+  level: info
+  # -- Log format: json | text | clean
+  format: clean
+  # -- Log file path. Leave empty to write to stderr.
+  file: ""
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 256Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

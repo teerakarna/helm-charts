@@ -18,6 +18,8 @@ helm repo update
 | [echoserver](./echoserver/) | HTTP echo server for testing ingress, load balancing, and network policies | 0.2.0 |
 | [netshoot](./netshoot/) | Network troubleshooting pod (nicolaka/netshoot) — DNS, connectivity, routing, network policy | 0.1.0 |
 | [sleep](./sleep/) | Minimal Alpine pod that sleeps indefinitely — exec in to run commands inside a namespace | 0.1.0 |
+| [scoutsuite](./scoutsuite/) | Multi-cloud security auditing (ScoutSuite) — CronJob/Job for AWS, GCP, Azure and more | 0.1.0 |
+| [gonymizer](./gonymizer/) | PostgreSQL data anonymization (Gonymizer) — dump, anonymize, and reload PII/PHI for QA | 0.1.0 |
 
 ## Usage
 
