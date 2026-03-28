@@ -1,0 +1,32 @@
+kube-hunter is ready to hunt for security weaknesses.
+
+Workload: {{ .Values.workloadType | upper }}
+Scope: {{ .Values.scope }}
+{{- if .Values.active }}
+
+WARNING: Active hunting mode is enabled. This can cause cluster disruption.
+{{- end }}
+{{- if eq .Values.workloadType "cronjob" }}
+Schedule: {{ .Values.schedule }}
+
+Trigger a hunt immediately:
+  kubectl create job --from=cronjob/{{ include "kube-hunter.fullname" . }} \
+    {{ include "kube-hunter.fullname" . }}-manual \
+    -n {{ .Release.Namespace }}
+{{- end }}
+
+Watch the hunt:
+  kubectl get jobs -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }}
+
+View results (results are printed to stdout):
+  kubectl logs -n {{ .Release.Namespace }} \
+    -l app.kubernetes.io/instance={{ .Release.Name }} --tail=200
+
+Save results locally:
+  kubectl logs -n {{ .Release.Namespace }} \
+    $(kubectl get pod -n {{ .Release.Namespace }} \
+      -l app.kubernetes.io/instance={{ .Release.Name }} \
+      -o jsonpath="{.items[0].metadata.name}") > kube-hunter-results.{{ .Values.report }}
+
+Clean up:
+  helm uninstall {{ .Release.Name }} --namespace {{ .Release.Namespace }}

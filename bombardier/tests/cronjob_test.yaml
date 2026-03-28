@@ -1,0 +1,73 @@
+suite: cronjob
+templates:
+  - cronjob.yaml
+tests:
+  - it: should not create a CronJob by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should create a CronJob when workloadType=cronjob
+    set:
+      workloadType: cronjob
+      target.url: "http://echo.default.svc.cluster.local/"
+    asserts:
+      - isKind:
+          of: CronJob
+      - equal:
+          path: spec.schedule
+          value: "0 6 * * 1"
+      - equal:
+          path: spec.concurrencyPolicy
+          value: Forbid
+      - equal:
+          path: spec.jobTemplate.spec.backoffLimit
+          value: 0
+
+  - it: should always include --connections
+    set:
+      workloadType: cronjob
+      target.url: "http://echo.default.svc.cluster.local/"
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args
+          content: --connections
+
+  - it: should include --duration when requests is null
+    set:
+      workloadType: cronjob
+      target.url: "http://echo.default.svc.cluster.local/"
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args
+          content: --duration
+
+  - it: should include target URL as last arg
+    set:
+      workloadType: cronjob
+      target.url: "http://echo.default.svc.cluster.local/"
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args[-1]
+          value: "http://echo.default.svc.cluster.local/"
+
+  - it: should set restartPolicy to Never
+    set:
+      workloadType: cronjob
+      target.url: "http://echo.default.svc.cluster.local/"
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.restartPolicy
+          value: Never
+
+  - it: should enforce security context
+    set:
+      workloadType: cronjob
+      target.url: "http://echo.default.svc.cluster.local/"
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.securityContext.runAsNonRoot
+          value: true
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation
+          value: false

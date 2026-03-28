@@ -1,0 +1,84 @@
+# -- Workload type: job | cronjob
+workloadType: job
+
+# -- CronJob schedule (used only when workloadType=cronjob).
+schedule: "0 3 * * 0"
+
+# -- CronJob concurrency policy. Forbid prevents overlapping hunts.
+concurrencyPolicy: Forbid
+
+# -- Number of failed CronJob runs to retain.
+failedJobsHistoryLimit: 3
+
+# -- Number of successful CronJob runs to retain.
+successfulJobsHistoryLimit: 1
+
+# -- Number of retries before marking the Job as failed.
+backoffLimit: 0
+
+# -- Maximum seconds a Job may run before being terminated (0 = no limit).
+activeDeadlineSeconds: 0
+
+image:
+  # -- Official kube-hunter image from Aqua Security.
+  repository: aquasec/kube-hunter
+  pullPolicy: IfNotPresent
+  # -- Pin to a specific tag in production.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+# -- Hunting scope.
+# pod: discover and hunt from within the pod's network namespace (recommended for in-cluster use).
+# cidr: actively scan a network range. Requires cidr to be set.
+scope: pod
+
+# -- Network range to scan when scope=cidr. Example: "10.0.0.0/8"
+cidr: ""
+
+# -- Enable active hunting.
+# WARNING: active mode attempts to exploit discovered vulnerabilities.
+# This can cause cluster disruption. Only use in dedicated test clusters with explicit approval.
+active: false
+
+# -- Report output format: table | json | yaml
+report: json
+
+# -- Print hunt statistics at the end of the report.
+statistics: false
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

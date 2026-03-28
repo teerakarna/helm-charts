@@ -1,0 +1,20 @@
+dbclient pod is running. Exec in to run queries:
+
+  kubectl exec -it -n {{ .Release.Namespace }} \
+    $(kubectl get pod -n {{ .Release.Namespace }} \
+      -l app.kubernetes.io/instance={{ .Release.Name }} \
+      -o jsonpath="{.items[0].metadata.name}") \
+    -- bash
+
+Available clients inside the pod:
+  psql      — PostgreSQL (set PGHOST, PGUSER, PGPASSWORD, PGDATABASE)
+  redis-cli — Redis
+  mysql     — MySQL / MariaDB
+
+Quick connect examples:
+  psql -h mydb.namespace.svc.cluster.local -U myuser -d mydb
+  redis-cli -h redis.namespace.svc.cluster.local
+  mysql -h mysql.namespace.svc.cluster.local -u myuser -p mydb
+
+Clean up:
+  helm uninstall {{ .Release.Name }} --namespace {{ .Release.Namespace }}

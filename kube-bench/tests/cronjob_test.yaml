@@ -1,0 +1,117 @@
+suite: cronjob
+templates:
+  - cronjob.yaml
+tests:
+  - it: should not create a CronJob by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should create a CronJob when workloadType=cronjob
+    set:
+      workloadType: cronjob
+    asserts:
+      - isKind:
+          of: CronJob
+      - equal:
+          path: spec.schedule
+          value: "0 4 * * 0"
+      - equal:
+          path: spec.concurrencyPolicy
+          value: Forbid
+      - equal:
+          path: spec.jobTemplate.spec.backoffLimit
+          value: 0
+
+  - it: should include 'run' as first arg
+    set:
+      workloadType: cronjob
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args[0]
+          value: run
+
+  - it: should not include --targets when targets is empty
+    set:
+      workloadType: cronjob
+    asserts:
+      - notContains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args
+          content: --targets
+
+  - it: should include --targets when targets is set
+    set:
+      workloadType: cronjob
+      targets:
+        - node
+        - policies
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args
+          content: --targets
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args
+          content: "node,policies"
+
+  - it: should include --benchmark when set
+    set:
+      workloadType: cronjob
+      benchmark: eks
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args
+          content: --benchmark
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args
+          content: eks
+
+  - it: should include --json flag for json format
+    set:
+      workloadType: cronjob
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args
+          content: --json
+
+  - it: should include --outputfile when persistence is enabled
+    set:
+      workloadType: cronjob
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args
+          content: --outputfile
+
+  - it: should set restartPolicy to Never
+    set:
+      workloadType: cronjob
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.restartPolicy
+          value: Never
+
+  - it: should set automountServiceAccountToken to true
+    set:
+      workloadType: cronjob
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.automountServiceAccountToken
+          value: true
+
+  - it: should enforce security context
+    set:
+      workloadType: cronjob
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.securityContext.runAsNonRoot
+          value: true
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation
+          value: false
+
+  - it: should mount PVC when persistence is enabled
+    set:
+      workloadType: cronjob
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.volumes[0].persistentVolumeClaim.claimName
+          value: RELEASE-NAME-kube-bench

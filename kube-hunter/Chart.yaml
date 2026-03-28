@@ -1,0 +1,18 @@
+apiVersion: v2
+name: kube-hunter
+description: Kubernetes penetration testing tool (kube-hunter by Aqua Security). Runs as a Job or CronJob to hunt for security weaknesses in Kubernetes clusters.
+type: application
+version: 0.1.0
+appVersion: "latest"
+keywords:
+  - kube-hunter
+  - security
+  - penetration-testing
+  - kubernetes
+home: https://github.com/teerakarna/helm-charts
+sources:
+  - https://github.com/teerakarna/helm-charts
+  - https://github.com/aquasecurity/kube-hunter
+maintainers:
+  - name: teerakarna
+    url: https://github.com/teerakarna

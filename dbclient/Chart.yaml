@@ -1,0 +1,19 @@
+apiVersion: v2
+name: dbclient
+description: Database client debug pod — psql, redis-cli, and mysql in one Alpine container. Exec in to run queries, inspect schemas, or debug connectivity from within a namespace.
+type: application
+version: 0.1.0
+appVersion: "latest"
+keywords:
+  - dbclient
+  - postgresql
+  - redis
+  - mysql
+  - debug
+  - troubleshooting
+home: https://github.com/teerakarna/helm-charts
+sources:
+  - https://github.com/teerakarna/helm-charts
+maintainers:
+  - name: teerakarna
+    url: https://github.com/teerakarna

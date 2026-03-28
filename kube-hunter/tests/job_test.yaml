@@ -1,0 +1,36 @@
+suite: job
+templates:
+  - job.yaml
+tests:
+  - it: should create a Job by default
+    asserts:
+      - isKind:
+          of: Job
+      - equal:
+          path: spec.backoffLimit
+          value: 0
+
+  - it: should not create a Job when workloadType=cronjob
+    set:
+      workloadType: cronjob
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should include --pod by default
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --pod
+
+  - it: should set restartPolicy to Never
+    asserts:
+      - equal:
+          path: spec.template.spec.restartPolicy
+          value: Never
+
+  - it: should set automountServiceAccountToken to false
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: false

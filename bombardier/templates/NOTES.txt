@@ -1,0 +1,22 @@
+bombardier load test is ready.
+
+Workload: {{ .Values.workloadType | upper }}
+Target:   {{ .Values.target.url | default "(not set — set target.url)" }}
+{{- if eq .Values.workloadType "cronjob" }}
+Schedule: {{ .Values.schedule }}
+
+Trigger a test immediately:
+  kubectl create job --from=cronjob/{{ include "bombardier.fullname" . }} \
+    {{ include "bombardier.fullname" . }}-manual \
+    -n {{ .Release.Namespace }}
+{{- end }}
+
+Watch the test:
+  kubectl get jobs -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }}
+
+View results:
+  kubectl logs -n {{ .Release.Namespace }} \
+    -l app.kubernetes.io/instance={{ .Release.Name }} --tail=50
+
+Clean up:
+  helm uninstall {{ .Release.Name }} --namespace {{ .Release.Namespace }}

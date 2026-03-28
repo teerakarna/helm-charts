@@ -1,0 +1,97 @@
+suite: cronjob
+templates:
+  - cronjob.yaml
+tests:
+  - it: should not create a CronJob by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should create a CronJob when workloadType=cronjob
+    set:
+      workloadType: cronjob
+    asserts:
+      - isKind:
+          of: CronJob
+      - equal:
+          path: spec.schedule
+          value: "0 3 * * 0"
+      - equal:
+          path: spec.concurrencyPolicy
+          value: Forbid
+      - equal:
+          path: spec.jobTemplate.spec.backoffLimit
+          value: 0
+
+  - it: should include --pod when scope=pod
+    set:
+      workloadType: cronjob
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args
+          content: --pod
+
+  - it: should include --cidr when scope=cidr
+    set:
+      workloadType: cronjob
+      scope: cidr
+      cidr: "10.0.0.0/8"
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args
+          content: --cidr
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args
+          content: "10.0.0.0/8"
+
+  - it: should NOT include --active by default
+    set:
+      workloadType: cronjob
+    asserts:
+      - notContains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args
+          content: --active
+
+  - it: should include --active when active=true
+    set:
+      workloadType: cronjob
+      active: true
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args
+          content: --active
+
+  - it: should always include --report flag
+    set:
+      workloadType: cronjob
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args
+          content: --report
+
+  - it: should set restartPolicy to Never
+    set:
+      workloadType: cronjob
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.restartPolicy
+          value: Never
+
+  - it: should set automountServiceAccountToken to false
+    set:
+      workloadType: cronjob
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.automountServiceAccountToken
+          value: false
+
+  - it: should enforce security context
+    set:
+      workloadType: cronjob
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.securityContext.runAsNonRoot
+          value: true
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation
+          value: false

@@ -1,0 +1,50 @@
+suite: deployment
+templates:
+  - deployment.yaml
+tests:
+  - it: should create a Deployment by default
+    asserts:
+      - isKind:
+          of: Deployment
+
+  - it: should default to 1 replica
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 1
+
+  - it: should use sleep infinity command by default
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].command[0]
+          value: sleep
+      - equal:
+          path: spec.template.spec.containers[0].args[0]
+          value: infinity
+
+  - it: should enforce security context
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsNonRoot
+          value: true
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation
+          value: false
+
+  - it: should inject env vars when specified
+    set:
+      env:
+        - name: PGHOST
+          value: mydb.example.com
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[0].name
+          value: PGHOST
+      - equal:
+          path: spec.template.spec.containers[0].env[0].value
+          value: mydb.example.com
+
+  - it: should not include env when not specified
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].env

@@ -1,0 +1,100 @@
+# -- Workload type: job | cronjob
+workloadType: job
+
+# -- CronJob schedule (used only when workloadType=cronjob).
+schedule: "0 6 * * 1"
+
+# -- CronJob concurrency policy. Forbid prevents overlapping load tests.
+concurrencyPolicy: Forbid
+
+# -- Number of failed CronJob runs to retain.
+failedJobsHistoryLimit: 3
+
+# -- Number of successful CronJob runs to retain.
+successfulJobsHistoryLimit: 3
+
+# -- Number of retries before marking the Job as failed.
+backoffLimit: 0
+
+# -- Maximum seconds a Job may run before being terminated (0 = no limit).
+activeDeadlineSeconds: 0
+
+image:
+  # -- No official bombardier container image exists. Build the included Dockerfile
+  # using the build-bombardier workflow and push to your registry.
+  repository: ghcr.io/teerakarna/bombardier
+  pullPolicy: IfNotPresent
+  # -- Image tag. Defaults to Chart.AppVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+# -- Target URL to benchmark. Required.
+# Example: http://my-service.my-namespace.svc.cluster.local/healthz
+target:
+  url: ""
+
+# -- Bombardier load test parameters.
+bombardier:
+  # -- Number of concurrent connections.
+  connections: 125
+  # -- Number of requests to send. Mutually exclusive with duration.
+  # If both are set, requests takes precedence.
+  requests: null
+  # -- Test duration (e.g. 30s, 1m, 2h). Used when requests is null.
+  duration: "30s"
+  # -- Maximum requests per second per connection (null = unlimited).
+  rate: null
+  # -- HTTP method.
+  method: GET
+  # -- HTTP headers to add. Key-value map.
+  # Example: { "Authorization": "Bearer token", "X-Request-ID": "test" }
+  headers: {}
+  # -- Request body string.
+  body: ""
+  # -- Request timeout.
+  timeout: "2s"
+  # -- Skip TLS certificate verification.
+  insecure: false
+  # -- Use HTTP/2 when available.
+  http2: true
+  # -- Print per-request latency distribution.
+  latencies: false
+  # -- Output format: plain-text | json | csv
+  format: plain-text
+
+resources:
+  limits:
+    cpu: "1"
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 64Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

@@ -18,8 +18,12 @@ helm repo update
 | [echoserver](./echoserver/) | HTTP echo server for testing ingress, load balancing, and network policies | 0.2.0 |
 | [netshoot](./netshoot/) | Network troubleshooting pod (nicolaka/netshoot) — DNS, connectivity, routing, network policy | 0.1.0 |
 | [sleep](./sleep/) | Minimal Alpine pod that sleeps indefinitely — exec in to run commands inside a namespace | 0.1.0 |
+| [dbclient](./dbclient/) | Database client debug pod — psql, redis-cli, and mysql in one Alpine container | 0.1.0 |
 | [scoutsuite](./scoutsuite/) | Multi-cloud security auditing (ScoutSuite) — CronJob/Job for AWS, GCP, Azure and more | 0.1.0 |
+| [kube-bench](./kube-bench/) | CIS Kubernetes Benchmark auditing (kube-bench) — Job/CronJob with ClusterRole | 0.1.0 |
+| [kube-hunter](./kube-hunter/) | Kubernetes penetration testing (kube-hunter) — hunt for security weaknesses in-cluster | 0.1.0 |
 | [gonymizer](./gonymizer/) | PostgreSQL data anonymization (Gonymizer) — dump, anonymize, and reload PII/PHI for QA | 0.1.0 |
+| [bombardier](./bombardier/) | Fast HTTP/S load testing (bombardier) — Job/CronJob to benchmark in-cluster services | 0.1.0 |
 
 ## Usage
 
@@ -40,6 +44,29 @@ helm install debug teerakarna/sleep -n <namespace>
 kubectl exec -it -n <namespace> \
   $(kubectl get pod -n <namespace> -l app.kubernetes.io/instance=debug -o jsonpath="{.items[0].metadata.name}") \
   -- sh
+
+# Database client pod — psql, redis-cli, mysql
+helm install db teerakarna/dbclient \
+  --set image.repository=ghcr.io/YOUR_USERNAME/dbclient \
+  -n <namespace>
+kubectl exec -it -n <namespace> \
+  $(kubectl get pod -n <namespace> -l app.kubernetes.io/instance=db -o jsonpath="{.items[0].metadata.name}") \
+  -- bash
+
+# CIS Kubernetes Benchmark — one-off audit
+helm install kb teerakarna/kube-bench
+kubectl wait --for=condition=complete job -l app.kubernetes.io/instance=kb --timeout=10m
+kubectl logs -l app.kubernetes.io/instance=kb
+
+# Kubernetes penetration test — hunt from inside the cluster
+helm install hunter teerakarna/kube-hunter
+kubectl logs -l app.kubernetes.io/instance=hunter
+
+# HTTP load test — benchmark an in-cluster service
+helm install load teerakarna/bombardier \
+  --set image.repository=ghcr.io/YOUR_USERNAME/bombardier \
+  --set target.url=http://echo-echoserver.default.svc.cluster.local/
+kubectl logs -l app.kubernetes.io/instance=load
 ```
 
 ## Development
@@ -58,25 +85,23 @@ pip install yamllint
 ### Lint a chart
 
 ```bash
-ct lint --config ct.yaml --charts echoserver
-ct lint --config ct.yaml --charts netshoot
-ct lint --config ct.yaml --charts sleep
+ct lint --config ct.yaml --charts <chart-name>
+ct lint --config ct.yaml  # lint all changed charts
 ```
 
 ### Run unit tests
 
 ```bash
-helm unittest echoserver
-helm unittest netshoot
-helm unittest sleep
+helm unittest <chart-name>
+helm unittest kube-bench kube-hunter dbclient bombardier
 ```
 
 ### Render templates locally
 
 ```bash
-helm template my-release echoserver
-helm template my-release netshoot
-helm template my-release sleep
+helm template my-release <chart-name>
+helm template my-release kube-bench
+helm template my-release bombardier --set target.url=http://example.com/
 ```
 
 ## Releasing
@@ -98,9 +123,11 @@ To release a new chart version:
   values.yaml
   templates/
   tests/                  # helm-unittest test files
+  docker/                 # Dockerfile (charts with custom images)
 .github/workflows/
   ci.yml                  # PR: ct lint + helm unittest
   release.yml             # Push to main: chart-releaser
+  build-*.yml             # Manual: build and push custom Docker images
 ct.yaml                   # chart-testing config
 artifacthub-repo.yml      # ArtifactHub metadata
 ```

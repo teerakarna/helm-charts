@@ -1,0 +1,101 @@
+# -- Workload type: job | cronjob
+workloadType: job
+
+# -- CronJob schedule (used only when workloadType=cronjob).
+schedule: "0 4 * * 0"
+
+# -- CronJob concurrency policy. Forbid prevents overlapping runs.
+concurrencyPolicy: Forbid
+
+# -- Number of failed CronJob runs to retain.
+failedJobsHistoryLimit: 3
+
+# -- Number of successful CronJob runs to retain.
+successfulJobsHistoryLimit: 1
+
+# -- Number of retries before marking the Job as failed.
+# 0 is recommended — a partial retry can produce inconsistent results.
+backoffLimit: 0
+
+# -- Maximum seconds a Job may run before being terminated (0 = no limit).
+activeDeadlineSeconds: 0
+
+image:
+  # -- Official kube-bench image from Aqua Security.
+  repository: aquasec/kube-bench
+  pullPolicy: IfNotPresent
+  # -- Pin to a specific release in production.
+  tag: "0.8.0"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+rbac:
+  # -- Create a ClusterRole and ClusterRoleBinding so kube-bench can read cluster state.
+  # Required for all API-based checks (the default for managed Kubernetes).
+  create: true
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  # kube-bench writes results to the output directory (a mounted volume).
+  # Set readOnlyRootFilesystem: true only after verifying no writes occur outside the mount.
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+      - ALL
+
+# -- Benchmark targets to run.
+# Supported values: node, master, controlplane, etcd, policies, managedservices
+# Empty list = auto-detect based on the node role.
+targets: []
+
+# -- CIS benchmark profile to use.
+# Examples: cis-1.8, cis-1.9, eks, aks, gke, rh-07, ack
+# Empty = auto-detect from the running Kubernetes version.
+benchmark: ""
+
+# -- Kubernetes version to use when selecting benchmark checks.
+# Empty = auto-detect from the API server.
+kubernetesVersion: ""
+
+# -- Output format: text | json | junit | asff
+outputFormat: json
+
+# -- Persistent storage for benchmark results.
+# kube-bench writes results to outputDir/results.<outputFormat> when persistence is enabled.
+persistence:
+  enabled: true
+  size: 100Mi
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  # -- Use an existing PVC instead of creating one.
+  existingClaim: ""
+  mountPath: /reports
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 64Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

@@ -1,0 +1,51 @@
+suite: job
+templates:
+  - job.yaml
+tests:
+  - it: should create a Job by default
+    asserts:
+      - isKind:
+          of: Job
+      - equal:
+          path: spec.backoffLimit
+          value: 0
+
+  - it: should not create a Job when workloadType=cronjob
+    set:
+      workloadType: cronjob
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should include 'run' as first arg
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].args[0]
+          value: run
+
+  - it: should set restartPolicy to Never
+    asserts:
+      - equal:
+          path: spec.template.spec.restartPolicy
+          value: Never
+
+  - it: should set automountServiceAccountToken to true
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: true
+
+  - it: should use emptyDir when persistence is disabled
+    set:
+      persistence.enabled: false
+    asserts:
+      - exists:
+          path: spec.template.spec.volumes[0].emptyDir
+
+  - it: should not include --outputfile when persistence is disabled
+    set:
+      persistence.enabled: false
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].args
+          content: --outputfile

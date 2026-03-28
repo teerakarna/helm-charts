@@ -1,0 +1,26 @@
+{{- if eq .Values.workloadType "job" -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "bombardier.fullname" . }}
+  labels:
+    {{- include "bombardier.labels" . | nindent 4 }}
+  {{- with .Values.podAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  backoffLimit: {{ .Values.backoffLimit }}
+  {{- if .Values.activeDeadlineSeconds }}
+  activeDeadlineSeconds: {{ .Values.activeDeadlineSeconds }}
+  {{- end }}
+  template:
+    metadata:
+      labels:
+        {{- include "bombardier.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- include "bombardier.podSpec" . | nindent 6 }}
+{{- end }}

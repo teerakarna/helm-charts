@@ -1,0 +1,63 @@
+replicaCount: 1
+
+image:
+  # -- No official all-in-one DB client image exists. Build the included Dockerfile
+  # using the build-dbclient workflow and push to your registry.
+  repository: ghcr.io/teerakarna/dbclient
+  pullPolicy: IfNotPresent
+  # -- Image tag. Defaults to Chart.AppVersion (latest).
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  # Some client tools write to /tmp — set to false to allow that.
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+      - ALL
+
+# -- Keep the container alive so you can exec into it.
+# Override to run a one-off query non-interactively.
+command: ["sleep"]
+args: ["infinity"]
+
+# -- Environment variables to inject.
+# Use secretKeyRef for credentials — never put passwords in plain values.
+# Example:
+#   - name: PGPASSWORD
+#     valueFrom:
+#       secretKeyRef:
+#         name: my-db-secret
+#         key: password
+env: []
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

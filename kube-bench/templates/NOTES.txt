@@ -1,0 +1,32 @@
+kube-bench is ready to run CIS Kubernetes Benchmark checks.
+
+Workload: {{ .Values.workloadType | upper }}
+{{- if eq .Values.workloadType "cronjob" }}
+Schedule: {{ .Values.schedule }}
+
+Trigger a scan immediately:
+  kubectl create job --from=cronjob/{{ include "kube-bench.fullname" . }} \
+    {{ include "kube-bench.fullname" . }}-manual \
+    -n {{ .Release.Namespace }}
+{{- end }}
+
+Watch the scan:
+  kubectl get jobs -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }}
+  kubectl logs -n {{ .Release.Namespace }} \
+    -l app.kubernetes.io/instance={{ .Release.Name }} --tail=100
+
+{{- if .Values.persistence.enabled }}
+
+View results (exec into a debug pod with the PVC mounted):
+  helm install debug teerakarna/sleep -n {{ .Release.Namespace }} \
+    --set persistence.enabled=false
+  kubectl exec -it -n {{ .Release.Namespace }} \
+    $(kubectl get pod -n {{ .Release.Namespace }} -l app.kubernetes.io/instance=debug -o jsonpath="{.items[0].metadata.name}") \
+    -- sh
+  # Inside the pod: cat {{ .Values.persistence.mountPath }}/results.{{ .Values.outputFormat }}
+{{- end }}
+
+Clean up:
+  helm uninstall {{ .Release.Name }} --namespace {{ .Release.Namespace }}
+  # Note: ClusterRole and ClusterRoleBinding are cluster-scoped and must be removed explicitly
+  # if rbac.create=true and helm uninstall does not clean them up.
