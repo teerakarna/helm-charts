@@ -115,6 +115,33 @@ To release a new chart version:
 
 > **First-time setup:** After the first release workflow runs and creates the `gh-pages` branch, enable GitHub Pages in the repo settings pointing to that branch.
 
+## Supply chain security
+
+All chart packages and Docker images are signed with [cosign](https://github.com/sigstore/cosign) using keyless signing (GitHub Actions OIDC). No key management required — signatures are verifiable against the public [Rekor](https://rekor.sigstore.dev) transparency log.
+
+### Verify a chart package
+
+Download the `.tgz` and `.bundle` files from the GitHub Release assets, then:
+
+```bash
+cosign verify-blob \
+  --bundle kube-bench-0.1.0.tgz.bundle \
+  --certificate-identity-regexp "https://github.com/teerakarna/helm-charts/.github/workflows/release.yml@refs/heads/main" \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+  kube-bench-0.1.0.tgz
+```
+
+### Verify a Docker image
+
+```bash
+cosign verify \
+  --certificate-identity-regexp "https://github.com/teerakarna/helm-charts/.github/workflows/build-.*@refs/heads/main" \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+  ghcr.io/teerakarna/dbclient:latest
+```
+
+Replace `dbclient` with `scoutsuite` or `bombardier` as appropriate.
+
 ## Repository structure
 
 ```
