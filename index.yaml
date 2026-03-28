@@ -25,4 +25,52 @@ entries:
     urls:
     - https://github.com/teerakarna/helm-charts/releases/download/echoserver-0.2.0/echoserver-0.2.0.tgz
     version: 0.2.0
-generated: "2026-03-29T00:28:27.156109+07:00"
+  netshoot:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2026-03-28T18:06:03.806317715Z"
+    description: Network troubleshooting pod based on nicolaka/netshoot. Deploy into
+      any namespace and exec in to diagnose DNS, connectivity, routing, and network
+      policy issues.
+    digest: a4d3eb790a413d0e80e2456800188e3258cb6c872d983e5d91b2015c1fd5b9cd
+    home: https://github.com/teerakarna/helm-charts
+    keywords:
+    - netshoot
+    - debugging
+    - networking
+    - troubleshooting
+    maintainers:
+    - name: teerakarna
+      url: https://github.com/teerakarna
+    name: netshoot
+    sources:
+    - https://github.com/teerakarna/helm-charts
+    - https://github.com/nicolaka/netshoot
+    type: application
+    urls:
+    - https://github.com/teerakarna/helm-charts/releases/download/netshoot-0.1.0/netshoot-0.1.0.tgz
+    version: 0.1.0
+  sleep:
+  - apiVersion: v2
+    appVersion: "3"
+    created: "2026-03-28T18:06:03.922963182Z"
+    description: Minimal long-running pod for exec-based debugging. Deploys an Alpine
+      container that sleeps indefinitely — exec in to run commands from inside a namespace
+      without deploying a real application.
+    digest: a8b49d76c1ec7b8c429fa8cc02e3f93b1526adf858dd574b6321e9a1d778ad09
+    home: https://github.com/teerakarna/helm-charts
+    keywords:
+    - sleep
+    - debugging
+    - utility
+    maintainers:
+    - name: teerakarna
+      url: https://github.com/teerakarna
+    name: sleep
+    sources:
+    - https://github.com/teerakarna/helm-charts
+    type: application
+    urls:
+    - https://github.com/teerakarna/helm-charts/releases/download/sleep-0.1.0/sleep-0.1.0.tgz
+    version: 0.1.0
+generated: "2026-03-28T18:06:03.922968742Z"
