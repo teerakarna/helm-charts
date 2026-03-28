@@ -30,11 +30,22 @@ jobs:
           changed=$(ct list-changed --config ct.yaml --target-branch ${{ github.event.repository.default_branch }})
           if [[ -n "$changed" ]]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "charts<<EOF" >> "$GITHUB_OUTPUT"
+            echo "$changed" >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Install helm-unittest plugin
         if: steps.list-changed.outputs.changed == 'true'
         run: helm plugin install https://github.com/helm-unittest/helm-unittest
+
+      - name: Install kubeconform
+        if: steps.list-changed.outputs.changed == 'true'
+        run: |
+          curl -sSLo kubeconform.tar.gz \
+            https://github.com/yannh/kubeconform/releases/download/v0.6.7/kubeconform-linux-amd64.tar.gz
+          tar xf kubeconform.tar.gz kubeconform
+          sudo mv kubeconform /usr/local/bin/
 
       - name: Lint changed charts
         if: steps.list-changed.outputs.changed == 'true'
@@ -43,8 +54,21 @@ jobs:
       - name: Run unit tests
         if: steps.list-changed.outputs.changed == 'true'
         run: |
-          for chart in $(ct list-changed --config ct.yaml --target-branch ${{ github.event.repository.default_branch }}); do
+          for chart in ${{ steps.list-changed.outputs.charts }}; do
             helm unittest "$chart"
+          done
+
+      - name: Validate templates with kubeconform
+        if: steps.list-changed.outputs.changed == 'true'
+        run: |
+          for chart in ${{ steps.list-changed.outputs.charts }}; do
+            echo "--- kubeconform: $chart"
+            helm template test-release "$chart" \
+              | kubeconform \
+                  --strict \
+                  --ignore-missing-schemas \
+                  --kubernetes-version 1.32.0 \
+                  --summary
           done
 
   # install:

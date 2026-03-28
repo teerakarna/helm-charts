@@ -19,6 +19,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      security-events: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,7 +34,26 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push
+      - name: Build for scanning (amd64, local)
+        uses: docker/build-push-action@v6
+        with:
+          context: dbclient/docker
+          platforms: linux/amd64
+          load: true
+          tags: scan-target:latest
+          cache-from: type=gha
+
+      - name: Scan with Trivy
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: scan-target:latest
+          format: table
+          exit-code: "1"
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: HIGH,CRITICAL
+
+      - name: Build and push (multi-arch)
         uses: docker/build-push-action@v6
         with:
           context: dbclient/docker

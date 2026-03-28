@@ -23,6 +23,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      security-events: write
 
     steps:
       - name: Checkout
@@ -38,6 +39,26 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build for scanning (local)
+        uses: docker/build-push-action@v6
+        with:
+          context: scoutsuite/docker
+          load: true
+          build-args: |
+            SCOUTSUITE_VERSION=${{ inputs.scoutsuite_version }}
+          tags: scan-target:latest
+          cache-from: type=gha
+
+      - name: Scan with Trivy
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: scan-target:latest
+          format: table
+          exit-code: "1"
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: HIGH,CRITICAL
 
       - name: Build and push
         uses: docker/build-push-action@v6
