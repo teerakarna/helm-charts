@@ -10,9 +10,6 @@ tests:
   - it: should create Ingress when enabled
     set:
       ingress.enabled: true
-      ingress.hosts[0].host: echo.example.com
-      ingress.hosts[0].paths[0].path: /
-      ingress.hosts[0].paths[0].pathType: Prefix
     asserts:
       - isKind:
           of: Ingress
@@ -21,18 +18,15 @@ tests:
           value: networking.k8s.io/v1
       - equal:
           path: spec.rules[0].host
-          value: echo.example.com
+          value: chart-example.local
       - equal:
           path: spec.rules[0].http.paths[0].pathType
-          value: Prefix
+          value: ImplementationSpecific
 
   - it: should set ingressClassName when provided
     set:
       ingress.enabled: true
       ingress.className: nginx
-      ingress.hosts[0].host: echo.example.com
-      ingress.hosts[0].paths[0].path: /
-      ingress.hosts[0].paths[0].pathType: Prefix
     asserts:
       - equal:
           path: spec.ingressClassName
@@ -41,9 +35,6 @@ tests:
   - it: should not set ingressClassName when empty
     set:
       ingress.enabled: true
-      ingress.hosts[0].host: echo.example.com
-      ingress.hosts[0].paths[0].path: /
-      ingress.hosts[0].paths[0].pathType: Prefix
     asserts:
       - notExists:
           path: spec.ingressClassName

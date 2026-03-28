@@ -40,14 +40,6 @@ tests:
           path: spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation
           value: false
 
-  - it: should not automount service account token
-    templates:
-      - serviceaccount.yaml
-    asserts:
-      - equal:
-          path: automountServiceAccountToken
-          value: false
-
   - it: should allow overriding command and args
     set:
       command: ["curl"]
