@@ -1,4 +1,3 @@
-{{/* vim: set filetype=mustache: */}}
 {{/*
 Expand the name of the chart.
 */}}
@@ -8,8 +7,8 @@ Expand the name of the chart.
 
 {{/*
 Create a default fully qualified app name.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-If release name contains chart name it will be used as a full name.
+Truncated at 63 chars (DNS naming spec limit).
+If the release name contains the chart name it is used as-is.
 */}}
 {{- define "echoserver.fullname" -}}
 {{- if .Values.fullnameOverride }}
@@ -25,7 +24,7 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 
 {{/*
-Create chart name and version as used by the chart label.
+Create chart name and version label value.
 */}}
 {{- define "echoserver.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
@@ -33,17 +32,12 @@ Create chart name and version as used by the chart label.
 
 {{/*
 Common labels
-https://helm.sh/docs/chart_best_practices/labels/
 */}}
 {{- define "echoserver.labels" -}}
-app.kubernetes.io/name:	{{ template "echoserver.name" . }}
-helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+helm.sh/chart: {{ include "echoserver.chart" . }}
 {{ include "echoserver.selectorLabels" . }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*

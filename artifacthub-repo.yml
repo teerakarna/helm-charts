@@ -1,0 +1,9 @@
+# ArtifactHub repository metadata.
+# To list this repo publicly on https://artifacthub.io:
+#   1. Register at https://artifacthub.io/control-panel/repositories
+#   2. Add the Helm repository URL: https://teerakarna.github.io/helm-charts
+#   3. Replace repositoryID below with the UUID assigned after registration.
+repositoryID: ""
+owners:
+  - name: teerakarna
+    url: https://github.com/teerakarna

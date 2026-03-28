@@ -1,0 +1,49 @@
+suite: ingress
+templates:
+  - ingress.yaml
+tests:
+  - it: should not create Ingress by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should create Ingress when enabled
+    set:
+      ingress.enabled: true
+      ingress.hosts[0].host: echo.example.com
+      ingress.hosts[0].paths[0].path: /
+      ingress.hosts[0].paths[0].pathType: Prefix
+    asserts:
+      - isKind:
+          of: Ingress
+      - equal:
+          path: apiVersion
+          value: networking.k8s.io/v1
+      - equal:
+          path: spec.rules[0].host
+          value: echo.example.com
+      - equal:
+          path: spec.rules[0].http.paths[0].pathType
+          value: Prefix
+
+  - it: should set ingressClassName when provided
+    set:
+      ingress.enabled: true
+      ingress.className: nginx
+      ingress.hosts[0].host: echo.example.com
+      ingress.hosts[0].paths[0].path: /
+      ingress.hosts[0].paths[0].pathType: Prefix
+    asserts:
+      - equal:
+          path: spec.ingressClassName
+          value: nginx
+
+  - it: should not set ingressClassName when empty
+    set:
+      ingress.enabled: true
+      ingress.hosts[0].host: echo.example.com
+      ingress.hosts[0].paths[0].path: /
+      ingress.hosts[0].paths[0].pathType: Prefix
+    asserts:
+      - notExists:
+          path: spec.ingressClassName

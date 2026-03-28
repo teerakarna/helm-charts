@@ -5,11 +5,24 @@ metadata:
   labels:
     {{- include "echoserver.labels" . | nindent 4 }}
   annotations:
-    "helm.sh/hook": test-success
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
-  containers:
-    - name: wget
-      image: busybox
-      command: ['wget']
-      args: ['{{ include "echoserver.fullname" . }}:{{ .Values.service.port }}']
   restartPolicy: Never
+  containers:
+    - name: curl
+      image: curlimages/curl:8.5.0
+      command:
+        - curl
+        - --fail
+        - --silent
+        - --show-error
+        - "http://{{ include "echoserver.fullname" . }}:{{ .Values.service.port }}/"
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 1000
+        capabilities:
+          drop:
+            - ALL
