@@ -1,2 +1,28 @@
 apiVersion: v1
-entries: {}
+entries:
+  echoserver:
+  - apiVersion: v2
+    appVersion: "1.10"
+    created: "2026-03-29T00:28:27.157007+07:00"
+    description: HTTP echo server for testing ingress controllers, load balancers,
+      and network policies in Kubernetes. Returns request headers, body, and environment
+      info.
+    digest: e074bb8c5419e0fbeaa2120abc5e1a22866f702e3485388328951ca639037dc3
+    home: https://github.com/teerakarna/helm-charts
+    keywords:
+    - echoserver
+    - testing
+    - debugging
+    - networking
+    maintainers:
+    - name: teerakarna
+      url: https://github.com/teerakarna
+    name: echoserver
+    sources:
+    - https://github.com/teerakarna/helm-charts
+    - https://github.com/kubernetes/kubernetes/tree/master/test/images/echoserver
+    type: application
+    urls:
+    - https://github.com/teerakarna/helm-charts/releases/download/echoserver-0.2.0/echoserver-0.2.0.tgz
+    version: 0.2.0
+generated: "2026-03-29T00:28:27.156109+07:00"
