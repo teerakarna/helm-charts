@@ -1,5 +1,57 @@
 apiVersion: v1
 entries:
+  bombardier:
+  - apiVersion: v2
+    appVersion: 1.2.6
+    created: "2026-03-28T20:22:50.27839875Z"
+    description: Fast HTTP/S benchmarking tool (bombardier by Evgeny Serlachev). Runs
+      as a Job or CronJob to load-test in-cluster services and measure throughput,
+      latency, and error rates.
+    digest: 78e0464f54da97b37dc5545740911c66e9cd9ee534178f766ed160a3a8065f55
+    home: https://github.com/teerakarna/helm-charts
+    keywords:
+    - bombardier
+    - load-testing
+    - benchmarking
+    - http
+    - performance
+    maintainers:
+    - name: teerakarna
+      url: https://github.com/teerakarna
+    name: bombardier
+    sources:
+    - https://github.com/teerakarna/helm-charts
+    - https://github.com/codesenberg/bombardier
+    type: application
+    urls:
+    - https://github.com/teerakarna/helm-charts/releases/download/bombardier-0.1.0/bombardier-0.1.0.tgz
+    version: 0.1.0
+  dbclient:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2026-03-28T20:22:50.443023704Z"
+    description: Database client debug pod — psql, redis-cli, and mysql in one Alpine
+      container. Exec in to run queries, inspect schemas, or debug connectivity from
+      within a namespace.
+    digest: b6dad2a429db77eaf6f8a14368c978d0534242298c71777e631f013901d0cfa5
+    home: https://github.com/teerakarna/helm-charts
+    keywords:
+    - dbclient
+    - postgresql
+    - redis
+    - mysql
+    - debug
+    - troubleshooting
+    maintainers:
+    - name: teerakarna
+      url: https://github.com/teerakarna
+    name: dbclient
+    sources:
+    - https://github.com/teerakarna/helm-charts
+    type: application
+    urls:
+    - https://github.com/teerakarna/helm-charts/releases/download/dbclient-0.1.0/dbclient-0.1.0.tgz
+    version: 0.1.0
   echoserver:
   - apiVersion: v2
     appVersion: "1.10"
@@ -53,6 +105,57 @@ entries:
     type: application
     urls:
     - https://github.com/teerakarna/helm-charts/releases/download/gonymizer-0.1.0/gonymizer-0.1.0.tgz
+    version: 0.1.0
+  kube-bench:
+  - apiVersion: v2
+    appVersion: 0.8.0
+    created: "2026-03-28T20:22:50.56564221Z"
+    description: CIS Kubernetes Benchmark auditing tool (kube-bench by Aqua Security).
+      Runs as a Job or CronJob to check whether Kubernetes is deployed according to
+      CIS security best practices.
+    digest: 28ddbc8a389363182d82369edd31aaafef68fa8816339609fbe21ddf29d8aaf2
+    home: https://github.com/teerakarna/helm-charts
+    keywords:
+    - kube-bench
+    - security
+    - cis
+    - benchmark
+    - auditing
+    - kubernetes
+    maintainers:
+    - name: teerakarna
+      url: https://github.com/teerakarna
+    name: kube-bench
+    sources:
+    - https://github.com/teerakarna/helm-charts
+    - https://github.com/aquasecurity/kube-bench
+    type: application
+    urls:
+    - https://github.com/teerakarna/helm-charts/releases/download/kube-bench-0.1.0/kube-bench-0.1.0.tgz
+    version: 0.1.0
+  kube-hunter:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2026-03-28T20:22:50.675982926Z"
+    description: Kubernetes penetration testing tool (kube-hunter by Aqua Security).
+      Runs as a Job or CronJob to hunt for security weaknesses in Kubernetes clusters.
+    digest: 2ac60da3105e699e44d8221929934da6424ea79853e7e20ca98ab2dbfdbd7d75
+    home: https://github.com/teerakarna/helm-charts
+    keywords:
+    - kube-hunter
+    - security
+    - penetration-testing
+    - kubernetes
+    maintainers:
+    - name: teerakarna
+      url: https://github.com/teerakarna
+    name: kube-hunter
+    sources:
+    - https://github.com/teerakarna/helm-charts
+    - https://github.com/aquasecurity/kube-hunter
+    type: application
+    urls:
+    - https://github.com/teerakarna/helm-charts/releases/download/kube-hunter-0.1.0/kube-hunter-0.1.0.tgz
     version: 0.1.0
   netshoot:
   - apiVersion: v2
@@ -130,4 +233,4 @@ entries:
     urls:
     - https://github.com/teerakarna/helm-charts/releases/download/sleep-0.1.0/sleep-0.1.0.tgz
     version: 0.1.0
-generated: "2026-03-28T19:30:09.922043315Z"
+generated: "2026-03-28T20:22:50.675996422Z"
