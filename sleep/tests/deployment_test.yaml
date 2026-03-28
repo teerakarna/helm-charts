@@ -1,0 +1,57 @@
+suite: deployment
+templates:
+  - deployment.yaml
+tests:
+  - it: should create a Deployment with default values
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.replicas
+          value: 1
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: alpine:3
+
+  - it: should run sleep infinity
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].command[0]
+          value: sleep
+      - equal:
+          path: spec.template.spec.containers[0].args[0]
+          value: infinity
+
+  - it: should enforce strict security context by default
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsNonRoot
+          value: true
+      - equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 65534
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation
+          value: false
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem
+          value: true
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.capabilities.drop[0]
+          value: ALL
+
+  - it: should not automount service account token
+    templates:
+      - serviceaccount.yaml
+    asserts:
+      - equal:
+          path: automountServiceAccountToken
+          value: false
+
+  - it: should use custom image tag
+    set:
+      image.tag: "3.19"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: alpine:3.19

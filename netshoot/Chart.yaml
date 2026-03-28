@@ -1,0 +1,18 @@
+apiVersion: v2
+name: netshoot
+description: Network troubleshooting pod based on nicolaka/netshoot. Deploy into any namespace and exec in to diagnose DNS, connectivity, routing, and network policy issues.
+type: application
+version: 0.1.0
+appVersion: "latest"
+keywords:
+  - netshoot
+  - debugging
+  - networking
+  - troubleshooting
+home: https://github.com/teerakarna/helm-charts
+sources:
+  - https://github.com/teerakarna/helm-charts
+  - https://github.com/nicolaka/netshoot
+maintainers:
+  - name: teerakarna
+    url: https://github.com/teerakarna

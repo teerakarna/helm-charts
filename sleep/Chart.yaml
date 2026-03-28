@@ -1,0 +1,16 @@
+apiVersion: v2
+name: sleep
+description: Minimal long-running pod for exec-based debugging. Deploys an Alpine container that sleeps indefinitely — exec in to run commands from inside a namespace without deploying a real application.
+type: application
+version: 0.1.0
+appVersion: "3"
+keywords:
+  - sleep
+  - debugging
+  - utility
+home: https://github.com/teerakarna/helm-charts
+sources:
+  - https://github.com/teerakarna/helm-charts
+maintainers:
+  - name: teerakarna
+    url: https://github.com/teerakarna

@@ -1,0 +1,11 @@
+netshoot is running. Exec into the pod to start diagnosing:
+
+  kubectl exec -it -n {{ .Release.Namespace }} \
+    $(kubectl get pod -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }} -o jsonpath="{.items[0].metadata.name}") \
+    -- bash
+
+Common tools available: ping, traceroute, dig, nslookup, curl, wget, tcpdump,
+ip, iptables, ss, netstat, nmap, iperf3, and more.
+
+Delete when done:
+  helm uninstall {{ .Release.Name }} --namespace {{ .Release.Namespace }}

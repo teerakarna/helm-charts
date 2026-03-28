@@ -16,24 +16,28 @@ helm repo update
 | Chart | Description | Version |
 |---|---|---|
 | [echoserver](./echoserver/) | HTTP echo server for testing ingress, load balancing, and network policies | 0.2.0 |
+| [netshoot](./netshoot/) | Network troubleshooting pod (nicolaka/netshoot) — DNS, connectivity, routing, network policy | 0.1.0 |
+| [sleep](./sleep/) | Minimal Alpine pod that sleeps indefinitely — exec in to run commands inside a namespace | 0.1.0 |
 
 ## Usage
 
 ```bash
-# Install echoserver
+# HTTP echo server — test ingress and routing
 helm install echo teerakarna/echoserver
-
-# Port-forward and send a test request
 kubectl port-forward svc/echo-echoserver 8080:80
 curl http://localhost:8080/
 
-# With ingress (nginx example)
-helm install echo teerakarna/echoserver \
-  --set ingress.enabled=true \
-  --set ingress.className=nginx \
-  --set "ingress.hosts[0].host=echo.example.com" \
-  --set "ingress.hosts[0].paths[0].path=/" \
-  --set "ingress.hosts[0].paths[0].pathType=Prefix"
+# Network troubleshooting pod — exec in to diagnose DNS/connectivity issues
+helm install netshoot teerakarna/netshoot -n <namespace>
+kubectl exec -it -n <namespace> \
+  $(kubectl get pod -n <namespace> -l app.kubernetes.io/instance=netshoot -o jsonpath="{.items[0].metadata.name}") \
+  -- bash
+
+# Minimal debug pod — exec in to run arbitrary commands inside a namespace
+helm install debug teerakarna/sleep -n <namespace>
+kubectl exec -it -n <namespace> \
+  $(kubectl get pod -n <namespace> -l app.kubernetes.io/instance=debug -o jsonpath="{.items[0].metadata.name}") \
+  -- sh
 ```
 
 ## Development
@@ -53,19 +57,24 @@ pip install yamllint
 
 ```bash
 ct lint --config ct.yaml --charts echoserver
+ct lint --config ct.yaml --charts netshoot
+ct lint --config ct.yaml --charts sleep
 ```
 
 ### Run unit tests
 
 ```bash
 helm unittest echoserver
+helm unittest netshoot
+helm unittest sleep
 ```
 
 ### Render templates locally
 
 ```bash
 helm template my-release echoserver
-helm template my-release echoserver --set ingress.enabled=true
+helm template my-release netshoot
+helm template my-release sleep
 ```
 
 ## Releasing

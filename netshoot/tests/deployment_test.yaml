@@ -1,0 +1,61 @@
+suite: deployment
+templates:
+  - deployment.yaml
+tests:
+  - it: should create a Deployment with default values
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.replicas
+          value: 1
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: nicolaka/netshoot:latest
+
+  - it: should run sleep infinity by default
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].command[0]
+          value: sleep
+      - equal:
+          path: spec.template.spec.containers[0].args[0]
+          value: infinity
+
+  - it: should add NET_RAW and NET_ADMIN capabilities
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].securityContext.capabilities.add
+          content: NET_RAW
+      - contains:
+          path: spec.template.spec.containers[0].securityContext.capabilities.add
+          content: NET_ADMIN
+      - contains:
+          path: spec.template.spec.containers[0].securityContext.capabilities.drop
+          content: ALL
+
+  - it: should not escalate privileges
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation
+          value: false
+
+  - it: should not automount service account token
+    templates:
+      - serviceaccount.yaml
+    asserts:
+      - equal:
+          path: automountServiceAccountToken
+          value: false
+
+  - it: should allow overriding command and args
+    set:
+      command: ["curl"]
+      args: ["-s", "http://example.com"]
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].command[0]
+          value: curl
+      - equal:
+          path: spec.template.spec.containers[0].args[0]
+          value: "-s"

@@ -1,0 +1,51 @@
+replicaCount: 1
+
+image:
+  repository: nicolaka/netshoot
+  pullPolicy: IfNotPresent
+  tag: ""  # defaults to appVersion (latest) — pin a specific tag in production
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+# netshoot requires elevated capabilities for network diagnostic tools:
+#   NET_RAW   — ping, traceroute, tcpdump
+#   NET_ADMIN — ip, iptables, tc, bridge
+# Reduce capabilities if you only need basic connectivity checks.
+podSecurityContext:
+  runAsNonRoot: false  # some tools (tcpdump, iptables) require root
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - NET_RAW
+      - NET_ADMIN
+
+# Keep the container alive so you can exec into it.
+# Override command/args to run a specific tool non-interactively.
+command: ["sleep"]
+args: ["infinity"]
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

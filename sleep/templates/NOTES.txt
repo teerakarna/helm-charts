@@ -1,0 +1,8 @@
+sleep is running. Exec into the pod to run commands from inside the namespace:
+
+  kubectl exec -it -n {{ .Release.Namespace }} \
+    $(kubectl get pod -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }} -o jsonpath="{.items[0].metadata.name}") \
+    -- sh
+
+Delete when done:
+  helm uninstall {{ .Release.Name }} --namespace {{ .Release.Namespace }}
