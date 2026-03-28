@@ -25,6 +25,35 @@ entries:
     urls:
     - https://github.com/teerakarna/helm-charts/releases/download/echoserver-0.2.0/echoserver-0.2.0.tgz
     version: 0.2.0
+  gonymizer:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2026-03-28T19:30:09.585542172Z"
+    description: PostgreSQL data anonymization tool (Gonymizer by SmithRx). Runs as
+      a CronJob or one-off Job to dump, anonymize, and optionally reload a PostgreSQL
+      database — replacing PII/PHI with realistic fake data for use in QA and testing
+      environments.
+    digest: b44d4e6a4fb989bd8e07fc75a2a1d819bd859737edfd596606032c109f25267b
+    home: https://github.com/teerakarna/helm-charts
+    keywords:
+    - gonymizer
+    - anonymization
+    - postgresql
+    - pii
+    - hipaa
+    - gdpr
+    - testing
+    maintainers:
+    - name: teerakarna
+      url: https://github.com/teerakarna
+    name: gonymizer
+    sources:
+    - https://github.com/teerakarna/helm-charts
+    - https://github.com/smithoss/gonymizer
+    type: application
+    urls:
+    - https://github.com/teerakarna/helm-charts/releases/download/gonymizer-0.1.0/gonymizer-0.1.0.tgz
+    version: 0.1.0
   netshoot:
   - apiVersion: v2
     appVersion: latest
@@ -50,6 +79,34 @@ entries:
     urls:
     - https://github.com/teerakarna/helm-charts/releases/download/netshoot-0.1.0/netshoot-0.1.0.tgz
     version: 0.1.0
+  scoutsuite:
+  - apiVersion: v2
+    appVersion: 5.14.0
+    created: "2026-03-28T19:30:09.810950054Z"
+    description: Multi-cloud security auditing tool (ScoutSuite by NCC Group). Runs
+      as a CronJob or one-off Job to audit AWS, GCP, Azure, and other cloud providers,
+      then writes an HTML report to a persistent volume.
+    digest: a9e4784aeff105618b5f5929bf00be38f54597912041c71412d393c888c9a236
+    home: https://github.com/teerakarna/helm-charts
+    keywords:
+    - scoutsuite
+    - security
+    - auditing
+    - aws
+    - gcp
+    - azure
+    - cloud
+    maintainers:
+    - name: teerakarna
+      url: https://github.com/teerakarna
+    name: scoutsuite
+    sources:
+    - https://github.com/teerakarna/helm-charts
+    - https://github.com/nccgroup/ScoutSuite
+    type: application
+    urls:
+    - https://github.com/teerakarna/helm-charts/releases/download/scoutsuite-0.1.0/scoutsuite-0.1.0.tgz
+    version: 0.1.0
   sleep:
   - apiVersion: v2
     appVersion: "3"
@@ -73,4 +130,4 @@ entries:
     urls:
     - https://github.com/teerakarna/helm-charts/releases/download/sleep-0.1.0/sleep-0.1.0.tgz
     version: 0.1.0
-generated: "2026-03-28T18:06:03.922968742Z"
+generated: "2026-03-28T19:30:09.922043315Z"
