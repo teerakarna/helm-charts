@@ -32,6 +32,9 @@ securityContext:
     drop:
       - ALL
 
+command: ["sleep"]
+args: ["infinity"]
+
 resources:
   limits:
     cpu: 50m
