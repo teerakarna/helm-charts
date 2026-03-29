@@ -2,6 +2,19 @@
 
 Vulnerability scanner ([Trivy](https://github.com/aquasecurity/trivy) by Aqua Security). Runs as a Kubernetes Job or CronJob to scan container images, filesystems, or entire clusters for vulnerabilities, misconfigurations, and secrets. Optionally writes reports to a persistent volume.
 
+## When to use this chart
+
+| Scenario | Recommended approach |
+|---|---|
+| Gate a build pipeline — block a deployment if the image has CVEs | [`aquasecurity/trivy-action`](https://github.com/aquasecurity/trivy-action) (GitHub Actions) |
+| Scheduled drift detection — find CVEs in images already running in the cluster | **This chart** (`workloadType: cronjob`) |
+| One-off audit of a specific image or filesystem path | **This chart** (`workloadType: job`) |
+| Continuous, always-on scanning of all workloads with kubectl-queryable results | [`trivy-operator` chart](../trivy-operator/) |
+
+The `trivy-action` integrates natively with GitHub Security (SARIF upload, code scanning alerts) and is the right default for CI/CD pipelines. This chart fills the gap it can't: scanning images that are already deployed, or targets that aren't reachable from a CI runner.
+
+Official docs: [Trivy documentation](https://aquasecurity.github.io/trivy/) · [trivy-action](https://github.com/aquasecurity/trivy-action)
+
 ## Install
 
 ```bash

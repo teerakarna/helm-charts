@@ -2,6 +2,24 @@
 
 Web application security scanner ([OWASP ZAP](https://www.zaproxy.org/)). Runs as a Kubernetes Job or CronJob using ZAP's [Automation Framework](https://www.zaproxy.org/docs/desktop/addons/automation-framework/). The scan plan is mounted from a ConfigMap — update it with `--set-file` without reinstalling. The default plan runs a traditional spider and passive scan, making it safe for use against any in-cluster service.
 
+## When to use this chart
+
+| Scenario | Recommended approach |
+|---|---|
+| Scan a service only reachable via in-cluster DNS (`svc.cluster.local`) | **This chart** |
+| Scan a publicly or externally reachable staging URL from CI | Official ZAP GitHub Actions (see below) |
+| Scheduled recurring DAST scan of an internal service | **This chart** (`workloadType: cronjob`) |
+
+For publicly reachable targets, the official ZAP GitHub Actions are the better fit: they post results as PR annotations, upload SARIF to GitHub Advanced Security, and don't require cluster access.
+
+| Action | Use for |
+|---|---|
+| [`zaproxy/action-baseline-scan`](https://github.com/zaproxy/action-baseline-scan) | Passive scan only — safe for any environment |
+| [`zaproxy/action-full-scan`](https://github.com/zaproxy/action-full-scan) | Spider + passive + active scan — test environments only |
+| [`zaproxy/action-api-scan`](https://github.com/zaproxy/action-api-scan) | OpenAPI/GraphQL/SOAP API targets |
+
+Official docs: [ZAP Automation Framework](https://www.zaproxy.org/docs/desktop/addons/automation-framework/) · [ZAP GitHub Actions](https://www.zaproxy.org/docs/docker/github-actions/)
+
 ## Install
 
 ```bash

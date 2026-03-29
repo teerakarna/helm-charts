@@ -2,6 +2,12 @@
 
 CIS Kubernetes Benchmark auditing tool ([kube-bench](https://github.com/aquasecurity/kube-bench) by Aqua Security). Runs as a Kubernetes Job or CronJob to check whether your cluster is deployed according to CIS security best practices, then writes a JSON/JUnit/ASFF results file to a persistent volume.
 
+## Why a Helm chart and not a CI/CD job
+
+kube-bench reads node-level configuration files (`/var/lib/kubelet/config.yaml`, `/etc/kubernetes/`) and cluster API state that are only accessible from within the cluster itself. There is no meaningful CI/CD equivalent — it must run on the cluster as a privileged Job. The chart is the standard deployment method recommended in the [kube-bench documentation](https://github.com/aquasecurity/kube-bench/blob/main/docs/running.md#running-in-a-kubernetes-cluster).
+
+Official docs: [kube-bench](https://github.com/aquasecurity/kube-bench) · [CIS Kubernetes Benchmark](https://www.cisecurity.org/benchmark/kubernetes)
+
 ## Install
 
 ```bash

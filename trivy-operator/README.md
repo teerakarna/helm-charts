@@ -2,7 +2,17 @@
 
 Kubernetes-native continuous vulnerability and misconfiguration scanner ([Trivy Operator](https://github.com/aquasecurity/trivy-operator) by Aqua Security). Runs as a controller that watches all workloads and automatically scans them, writing results as native CRDs queryable with `kubectl`.
 
-Unlike the [trivy chart](../trivy/) which runs a one-off Job, this operator runs continuously and keeps reports up to date as workloads change.
+## When to use this chart
+
+| Scenario | Recommended approach |
+|---|---|
+| Gate a build pipeline — block a deployment if the image has CVEs | [`aquasecurity/trivy-action`](https://github.com/aquasecurity/trivy-action) (GitHub Actions) |
+| Always-on scanning of all workloads; results queryable via `kubectl` or a dashboard | **This chart** |
+| On-demand or scheduled scan of a specific image or target | [`trivy` chart](../trivy/) |
+
+Choose this chart over the `trivy` chart when you want persistent CRD-based reports, Prometheus metrics (`/metrics`), and automatic re-scanning when workloads change. Choose `trivy-action` in CI to catch vulnerabilities before they reach the cluster at all — the two are complementary, not mutually exclusive.
+
+Official docs: [Trivy Operator documentation](https://aquasecurity.github.io/trivy-operator/) · [trivy-action](https://github.com/aquasecurity/trivy-action)
 
 ## Install
 

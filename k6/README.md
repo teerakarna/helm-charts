@@ -2,6 +2,19 @@
 
 Scriptable HTTP/S load testing tool ([Grafana k6](https://github.com/grafana/k6)). Runs a JavaScript test script as a Kubernetes Job or CronJob. The script is mounted from a ConfigMap — update it with `--set-file` without reinstalling. Supports VUs, duration, thresholds, and custom checks.
 
+## When to use this chart
+
+| Scenario | Recommended approach |
+|---|---|
+| Load test a service only reachable via in-cluster DNS (`svc.cluster.local`) | **This chart** |
+| Load test an externally reachable URL from CI | [`grafana/run-k6-action`](https://github.com/grafana/run-k6-action) (GitHub Actions) |
+| Scheduled recurring load test against an internal service | **This chart** (`workloadType: cronjob`) |
+| Distributed cloud load testing from multiple global locations | [Grafana Cloud k6](https://grafana.com/products/cloud/k6/) |
+
+The `run-k6-action` runs k6 directly in the CI runner and posts threshold results back to the workflow summary — use it when the target URL is reachable from GitHub Actions. This chart is the right choice when the target is an internal service and moving load generation inside the cluster avoids the need for ingress, VPN, or a jump host.
+
+Official docs: [k6 documentation](https://grafana.com/docs/k6/) · [run-k6-action](https://github.com/grafana/run-k6-action)
+
 ## Install
 
 ```bash
