@@ -3,7 +3,7 @@
 #   1. Register at https://artifacthub.io/control-panel/repositories
 #   2. Add the Helm repository URL: https://teerakarna.github.io/helm-charts
 #   3. Replace repositoryID below with the UUID assigned after registration.
-repositoryID: ""
+repositoryID: "1f420c81-4e3a-49eb-9de4-597e2964da5f"
 owners:
   - name: teerakarna
     url: https://github.com/teerakarna
