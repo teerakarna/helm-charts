@@ -2,8 +2,12 @@ apiVersion: v2
 name: kube-bench
 description: CIS Kubernetes Benchmark auditing tool (kube-bench by Aqua Security). Runs as a Job or CronJob to check whether Kubernetes is deployed according to CIS security best practices.
 type: application
-version: 0.1.0
-appVersion: "0.8.0"
+version: 0.2.0
+appVersion: "0.15.0"
+annotations:
+  artifacthub.io/images: |
+    - name: kube-bench
+      image: aquasec/kube-bench:v0.15.0
 keywords:
   - kube-bench
   - security

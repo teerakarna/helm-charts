@@ -25,7 +25,7 @@ image:
   repository: aquasec/kube-bench
   pullPolicy: IfNotPresent
   # -- Pin to a specific release in production.
-  tag: "0.8.0"
+  tag: "v0.15.0"
 
 imagePullSecrets: []
 nameOverride: ""

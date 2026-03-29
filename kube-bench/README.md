@@ -80,7 +80,7 @@ The ClusterRole grants `get`/`list` only — no write access, no exec access. Se
 | `schedule` | `"0 4 * * 0"` | CronJob schedule (weekly Sunday 4am) |
 | `backoffLimit` | `0` | Do not retry failed runs |
 | `image.repository` | `aquasec/kube-bench` | Official Aqua Security image |
-| `image.tag` | `"0.8.0"` | Pin to a specific release |
+| `image.tag` | `"v0.15.0"` | Pin to a specific release |
 | `rbac.create` | `true` | Create ClusterRole + ClusterRoleBinding |
 | `targets` | `[]` | Targets: `node`, `master`, `controlplane`, `etcd`, `policies`, `managedservices` |
 | `benchmark` | `""` | Benchmark profile: `cis-1.8`, `eks`, `aks`, `gke`, etc. (auto-detect if empty) |
