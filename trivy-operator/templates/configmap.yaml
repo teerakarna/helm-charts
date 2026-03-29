@@ -1,0 +1,84 @@
+---
+# Operator behaviour settings — read via envFrom in the Deployment.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trivy-operator-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "trivy-operator.labels" . | nindent 4 }}
+data:
+  OPERATOR_LOG_DEV_MODE: "false"
+  OPERATOR_SCAN_JOB_TTL: ""
+  OPERATOR_SCAN_JOB_TIMEOUT: {{ .Values.operator.scanJobTimeout | quote }}
+  OPERATOR_CONCURRENT_SCAN_JOBS_LIMIT: {{ .Values.operator.scanJobsConcurrentLimit | quote }}
+  OPERATOR_CONCURRENT_NODE_COLLECTOR_LIMIT: "1"
+  OPERATOR_SCAN_JOB_RETRY_AFTER: {{ .Values.operator.scanJobsRetryDelay | quote }}
+  OPERATOR_BATCH_DELETE_LIMIT: "10"
+  OPERATOR_BATCH_DELETE_DELAY: "10s"
+  OPERATOR_METRICS_BIND_ADDRESS: ":8080"
+  OPERATOR_METRICS_FINDINGS_ENABLED: {{ .Values.operator.metricsFindingsEnabled | quote }}
+  OPERATOR_METRICS_VULN_ID_ENABLED: "false"
+  OPERATOR_HEALTH_PROBE_BIND_ADDRESS: ":9090"
+  OPERATOR_VULNERABILITY_SCANNER_ENABLED: {{ .Values.operator.vulnerabilityScannerEnabled | quote }}
+  OPERATOR_SBOM_GENERATION_ENABLED: {{ .Values.operator.sbomGenerationEnabled | quote }}
+  OPERATOR_CLUSTER_SBOM_CACHE_ENABLED: "false"
+  OPERATOR_VULNERABILITY_SCANNER_SCAN_ONLY_CURRENT_REVISIONS: {{ .Values.operator.vulnerabilityScannerScanOnlyCurrentRevisions | quote }}
+  OPERATOR_SCANNER_REPORT_TTL: {{ .Values.operator.scannerReportTTL | quote }}
+  OPERATOR_CACHE_REPORT_TTL: "120h"
+  CONTROLLER_CACHE_SYNC_TIMEOUT: "5m"
+  OPERATOR_CONFIG_AUDIT_SCANNER_ENABLED: {{ .Values.operator.configAuditScannerEnabled | quote }}
+  OPERATOR_RBAC_ASSESSMENT_SCANNER_ENABLED: {{ .Values.operator.rbacAssessmentScannerEnabled | quote }}
+  OPERATOR_INFRA_ASSESSMENT_SCANNER_ENABLED: {{ .Values.operator.infraAssessmentScannerEnabled | quote }}
+  OPERATOR_CONFIG_AUDIT_SCANNER_SCAN_ONLY_CURRENT_REVISIONS: {{ .Values.operator.configAuditScannerScanOnlyCurrentRevisions | quote }}
+  OPERATOR_EXPOSED_SECRET_SCANNER_ENABLED: {{ .Values.operator.exposedSecretScannerEnabled | quote }}
+  OPERATOR_METRICS_EXPOSED_SECRET_INFO_ENABLED: "false"
+  OPERATOR_METRICS_CONFIG_AUDIT_INFO_ENABLED: "false"
+  OPERATOR_METRICS_RBAC_ASSESSMENT_INFO_ENABLED: "false"
+  OPERATOR_METRICS_INFRA_ASSESSMENT_INFO_ENABLED: "false"
+  OPERATOR_METRICS_IMAGE_INFO_ENABLED: "false"
+  OPERATOR_METRICS_CLUSTER_COMPLIANCE_INFO_ENABLED: "false"
+  OPERATOR_WEBHOOK_BROADCAST_URL: ""
+  OPERATOR_WEBHOOK_BROADCAST_TIMEOUT: "30s"
+  OPERATOR_WEBHOOK_BROADCAST_CUSTOM_HEADERS: ""
+  OPERATOR_SEND_DELETED_REPORTS: "false"
+  OPERATOR_PRIVATE_REGISTRY_SCAN_SECRETS_NAMES: "{}"
+  OPERATOR_ACCESS_GLOBAL_SECRETS_SERVICE_ACCOUNTS: "true"
+  OPERATOR_BUILT_IN_TRIVY_SERVER: "false"
+  TRIVY_SERVER_HEALTH_CHECK_CACHE_EXPIRATION: "10h"
+  OPERATOR_MERGE_RBAC_FINDING_WITH_CONFIG_AUDIT: "false"
+  OPERATOR_CLUSTER_COMPLIANCE_ENABLED: {{ .Values.operator.clusterComplianceEnabled | quote }}
+---
+# Trivy scanner settings — read directly by the operator from this fixed ConfigMap name.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trivy-operator-trivy-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "trivy-operator.labels" . | nindent 4 }}
+data:
+  trivy.repository: {{ .Values.trivy.image.repository | quote }}
+  trivy.tag: {{ .Values.trivy.image.tag | quote }}
+  trivy.imagePullPolicy: {{ .Values.trivy.image.pullPolicy | quote }}
+  trivy.severity: {{ .Values.trivy.severity | quote }}
+  trivy.mode: {{ .Values.trivy.mode | quote }}
+  trivy.slow: "true"
+  trivy.skipJavaDBUpdate: "false"
+  trivy.includeDevDeps: "false"
+  trivy.imageScanCacheDir: "/var/trivyoperator/trivy-db"
+  trivy.filesystemScanCacheDir: "/var/trivyoperator/trivy-fs-db"
+  trivy.dbRepository: "ghcr.io/aquasecurity/trivy-db"
+  trivy.javaDbRepository: "ghcr.io/aquasecurity/trivy-java-db"
+  trivy.command: "image"
+  trivy.sbomSources: ""
+  trivy.additionalVulnerabilityReportFields: ""
+  trivy.supportedConfigAuditKinds: "Workload,Service,Role,ClusterRole,NetworkPolicy,Ingress,LimitRange,ResourceQuota"
+  {{- if .Values.trivy.ignoreUnfixed }}
+  trivy.ignoreUnfixed: "true"
+  {{- end }}
+  trivy.timeout: "5m0s"
+  trivy.resources.requests.cpu: {{ .Values.trivy.resources.requests.cpu | quote }}
+  trivy.resources.requests.memory: {{ .Values.trivy.resources.requests.memory | quote }}
+  trivy.resources.limits.cpu: {{ .Values.trivy.resources.limits.cpu | quote }}
+  trivy.resources.limits.memory: {{ .Values.trivy.resources.limits.memory | quote }}

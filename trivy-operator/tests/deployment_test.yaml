@@ -1,0 +1,75 @@
+suite: trivy-operator deployment
+templates:
+  - deployment.yaml
+tests:
+  - it: renders a Deployment by default
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.replicas
+          value: 1
+      - equal:
+          path: spec.strategy.type
+          value: Recreate
+
+  - it: sets OPERATOR_NAMESPACE to release namespace
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: OPERATOR_NAMESPACE
+            value: NAMESPACE
+
+  - it: sets OPERATOR_TARGET_NAMESPACES from values
+    set:
+      targetNamespaces: "app1,app2"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: OPERATOR_TARGET_NAMESPACES
+            value: "app1,app2"
+
+  - it: mounts trivy-operator-config via envFrom
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].envFrom
+          content:
+            configMapRef:
+              name: trivy-operator-config
+
+  - it: uses chart appVersion as image tag by default
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].image
+          pattern: "ghcr.io/aquasecurity/trivy-operator:0\\.30\\.1"
+
+  - it: uses custom image tag when set
+    set:
+      image.tag: "0.28.0"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "ghcr.io/aquasecurity/trivy-operator:0.28.0"
+
+  - it: sets automountServiceAccountToken true
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: true
+
+  - it: exposes metrics and probes ports
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].ports
+          content:
+            name: metrics
+            containerPort: 8080
+            protocol: TCP
+      - contains:
+          path: spec.template.spec.containers[0].ports
+          content:
+            name: probes
+            containerPort: 9090
+            protocol: TCP

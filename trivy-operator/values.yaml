@@ -1,0 +1,126 @@
+# -- Namespaces to scan. Empty string = all namespaces.
+targetNamespaces: ""
+
+# -- Namespaces to exclude from scanning (comma-separated, supports glob patterns).
+# Only applies when targetNamespaces is empty.
+excludeNamespaces: ""
+
+# -- Workload types to include in vulnerability and config-audit scans.
+targetWorkloads: "pod,replicaset,replicationcontroller,statefulset,daemonset,cronjob,job"
+
+image:
+  # -- Official Trivy Operator image from Aqua Security.
+  repository: ghcr.io/aquasecurity/trivy-operator
+  pullPolicy: IfNotPresent
+  # -- Pin to a specific release. Defaults to Chart.AppVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+rbac:
+  # -- Create ClusterRole + ClusterRoleBinding and the namespace-scoped Role + RoleBinding.
+  create: true
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+operator:
+  # -- Enable continuous vulnerability scanning of workload images.
+  vulnerabilityScannerEnabled: true
+
+  # -- Enable configuration audit scanning (checks manifests against CIS/NSA best practices).
+  configAuditScannerEnabled: true
+
+  # -- Enable RBAC assessment scanning (checks for overly permissive roles).
+  rbacAssessmentScannerEnabled: true
+
+  # -- Enable infrastructure assessment scanning (checks node/kubelet configuration).
+  infraAssessmentScannerEnabled: true
+
+  # -- Enable exposed secret scanning (checks for secrets embedded in image layers).
+  exposedSecretScannerEnabled: true
+
+  # -- Enable SBOM generation. Significantly increases scan time and storage. Requires sbomreports CRD.
+  sbomGenerationEnabled: false
+
+  # -- Enable cluster compliance reporting (CIS Benchmarks, NSA guidelines).
+  clusterComplianceEnabled: false
+
+  # -- How long a report lives before the workload is re-scanned. Empty = disabled (scan once only).
+  scannerReportTTL: "24h"
+
+  # -- Maximum time a scan job may run before it is killed.
+  scanJobTimeout: "5m"
+
+  # -- Maximum number of concurrent scan jobs the operator will create.
+  scanJobsConcurrentLimit: 10
+
+  # -- How long to wait before retrying a failed scan job.
+  scanJobsRetryDelay: "30s"
+
+  # -- Only scan the current revision of Deployments; skip old ReplicaSets.
+  vulnerabilityScannerScanOnlyCurrentRevisions: true
+  configAuditScannerScanOnlyCurrentRevisions: true
+
+  # -- Expose vulnerability and misconfiguration counts as Prometheus metrics on :8080/metrics.
+  metricsFindingsEnabled: true
+
+# -- Settings for the Trivy scanner image spawned by the operator to perform scans.
+trivy:
+  image:
+    # -- Trivy scanner image. Keep in sync with the appVersion of the trivy chart.
+    repository: aquasec/trivy
+    tag: "0.69.3"
+    pullPolicy: IfNotPresent
+
+  # -- Severity levels to include in reports.
+  severity: "HIGH,CRITICAL"
+
+  # -- Omit vulnerabilities that have no available fix.
+  ignoreUnfixed: false
+
+  # -- Scanner mode: Standalone (each Job downloads the DB) or ClientServer (shared Trivy server).
+  mode: "Standalone"
+
+  # -- Resource requests/limits for each scan Job spawned by the operator.
+  resources:
+    requests:
+      cpu: 100m
+      memory: 100M
+    limits:
+      cpu: "1"
+      memory: 500M
+
+# -- Resource requests/limits for the operator Deployment itself.
+resources:
+  limits:
+    cpu: 500m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

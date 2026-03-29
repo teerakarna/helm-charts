@@ -1,0 +1,109 @@
+{{- if .Values.rbac.create }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "trivy-operator.fullname" . }}
+  labels:
+    {{- include "trivy-operator.labels" . | nindent 4 }}
+rules:
+- apiGroups: [""]
+  resources: [configmaps, limitranges, nodes, pods, replicationcontrollers, resourcequotas, services]
+  verbs: [get, list, watch]
+- apiGroups: [""]
+  resources: [namespaces]
+  verbs: [get]
+- apiGroups: [""]
+  resources: [pods/log]
+  verbs: [get, list]
+- apiGroups: [apiextensions.k8s.io]
+  resources: [customresourcedefinitions]
+  verbs: [get, list, watch]
+- apiGroups: [apps]
+  resources: [daemonsets, deployments, replicasets, statefulsets]
+  verbs: [get, list, watch]
+- apiGroups: [aquasecurity.github.io]
+  resources:
+    - clustercompliancedetailreports
+    - clustercompliancereports
+    - clusterconfigauditreports
+    - clusterinfraassessmentreports
+    - clusterrbacassessmentreports
+    - clustersbomreports
+    - clustervulnerabilityreports
+    - configauditreports
+    - exposedsecretreports
+    - infraassessmentreports
+    - rbacassessmentreports
+    - sbomreports
+    - vulnerabilityreports
+  verbs: [create, delete, get, list, patch, update, watch]
+- apiGroups: [aquasecurity.github.io]
+  resources: [clustercompliancereports/status]
+  verbs: [get, patch, update]
+- apiGroups: [batch]
+  resources: [cronjobs]
+  verbs: [get, list, watch]
+- apiGroups: [batch]
+  resources: [jobs]
+  verbs: [create, delete, get, list, watch]
+- apiGroups: [networking.k8s.io]
+  resources: [ingresses, networkpolicies]
+  verbs: [get, list, watch]
+- apiGroups: [rbac.authorization.k8s.io]
+  resources: [clusterrolebindings, clusterroles, rolebindings, roles]
+  verbs: [get, list, watch]
+- apiGroups: [""]
+  resources: [secrets]
+  verbs: [create, get, update]
+- apiGroups: [""]
+  resources: [serviceaccounts]
+  verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "trivy-operator.fullname" . }}
+  labels:
+    {{- include "trivy-operator.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "trivy-operator.fullname" . }}
+subjects:
+- kind: ServiceAccount
+  name: {{ include "trivy-operator.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+---
+# Namespace-scoped Role so the operator can manage ConfigMaps and Secrets in its own namespace.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "trivy-operator.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "trivy-operator.labels" . | nindent 4 }}
+rules:
+- apiGroups: [""]
+  resources: [configmaps]
+  verbs: [create, get, list, watch]
+- apiGroups: [""]
+  resources: [secrets]
+  verbs: [create, get, delete, update]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "trivy-operator.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "trivy-operator.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "trivy-operator.fullname" . }}
+subjects:
+- kind: ServiceAccount
+  name: {{ include "trivy-operator.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+{{- end }}
