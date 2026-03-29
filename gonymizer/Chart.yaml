@@ -2,8 +2,12 @@ apiVersion: v2
 name: gonymizer
 description: PostgreSQL data anonymization tool (Gonymizer by SmithRx). Runs as a CronJob or one-off Job to dump, anonymize, and optionally reload a PostgreSQL database — replacing PII/PHI with realistic fake data for use in QA and testing environments.
 type: application
-version: 0.1.0
+version: 0.1.1
 appVersion: "latest"
+annotations:
+  artifacthub.io/images: |
+    - name: gonymizer
+      image: smithoss/gonymizer:latest
 keywords:
   - gonymizer
   - anonymization

@@ -2,8 +2,12 @@ apiVersion: v2
 name: toxiproxy
 description: Network fault injection proxy (Shopify Toxiproxy). Deploys a configurable TCP proxy that can inject latency, packet loss, bandwidth limits, and timeouts for resilience and chaos testing of in-cluster services.
 type: application
-version: 0.1.0
+version: 0.1.1
 appVersion: "2.9.0"
+annotations:
+  artifacthub.io/images: |
+    - name: toxiproxy
+      image: ghcr.io/shopify/toxiproxy:2.9.0
 keywords:
   - toxiproxy
   - chaos

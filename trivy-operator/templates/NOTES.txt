@@ -1,0 +1,27 @@
+Trivy Operator is running and watching workloads in: {{ if .Values.targetNamespaces }}{{ .Values.targetNamespaces }}{{ else }}all namespaces{{ end }}
+{{- if .Values.excludeNamespaces }}
+Excluding: {{ .Values.excludeNamespaces }}
+{{- end }}
+
+Scanners enabled:
+  Vulnerability:    {{ .Values.operator.vulnerabilityScannerEnabled }}
+  Config audit:     {{ .Values.operator.configAuditScannerEnabled }}
+  Exposed secrets:  {{ .Values.operator.exposedSecretScannerEnabled }}
+  RBAC assessment:  {{ .Values.operator.rbacAssessmentScannerEnabled }}
+  Infra assessment: {{ .Values.operator.infraAssessmentScannerEnabled }}
+
+Reports refresh every {{ .Values.operator.scannerReportTTL }} (scannerReportTTL).
+
+View vulnerability reports:
+  kubectl get vulnerabilityreports -A
+  kubectl get configauditreports -A
+  kubectl get exposedsecretreports -A
+
+Watch operator logs:
+  kubectl logs -n {{ .Release.Namespace }} \
+    -l app.kubernetes.io/instance={{ .Release.Name }} -f
+
+Metrics endpoint (port-forward):
+  kubectl port-forward -n {{ .Release.Namespace }} \
+    deploy/{{ include "trivy-operator.fullname" . }} 8080:8080
+  # curl http://localhost:8080/metrics

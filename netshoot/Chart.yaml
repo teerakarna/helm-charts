@@ -2,8 +2,12 @@ apiVersion: v2
 name: netshoot
 description: Network troubleshooting pod based on nicolaka/netshoot. Deploy into any namespace and exec in to diagnose DNS, connectivity, routing, and network policy issues.
 type: application
-version: 0.1.0
+version: 0.1.1
 appVersion: "latest"
+annotations:
+  artifacthub.io/images: |
+    - name: netshoot
+      image: nicolaka/netshoot:latest
 keywords:
   - netshoot
   - debugging

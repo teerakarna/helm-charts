@@ -2,8 +2,12 @@ apiVersion: v2
 name: echoserver
 description: HTTP echo server for testing ingress controllers, load balancers, and network policies in Kubernetes. Returns request headers, body, and environment info.
 type: application
-version: 0.2.0
+version: 0.2.1
 appVersion: "1.10"
+annotations:
+  artifacthub.io/images: |
+    - name: echoserver
+      image: registry.k8s.io/echoserver:1.10
 keywords:
   - echoserver
   - testing

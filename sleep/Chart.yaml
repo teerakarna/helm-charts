@@ -2,8 +2,12 @@ apiVersion: v2
 name: sleep
 description: Minimal long-running pod for exec-based debugging. Deploys an Alpine container that sleeps indefinitely — exec in to run commands from inside a namespace without deploying a real application.
 type: application
-version: 0.1.0
+version: 0.1.1
 appVersion: "3"
+annotations:
+  artifacthub.io/images: |
+    - name: sleep
+      image: alpine:3
 keywords:
   - sleep
   - debugging

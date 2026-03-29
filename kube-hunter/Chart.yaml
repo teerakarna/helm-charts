@@ -2,8 +2,12 @@ apiVersion: v2
 name: kube-hunter
 description: Kubernetes penetration testing tool (kube-hunter by Aqua Security). Runs as a Job or CronJob to hunt for security weaknesses in Kubernetes clusters.
 type: application
-version: 0.1.0
+version: 0.1.1
 appVersion: "latest"
+annotations:
+  artifacthub.io/images: |
+    - name: kube-hunter
+      image: aquasec/kube-hunter:latest
 keywords:
   - kube-hunter
   - security

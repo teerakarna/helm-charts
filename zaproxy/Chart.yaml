@@ -2,8 +2,12 @@ apiVersion: v2
 name: zaproxy
 description: Web application security scanner (OWASP ZAP). Runs an Automation Framework plan as a Job or CronJob to spider and scan in-cluster services for vulnerabilities.
 type: application
-version: 0.1.0
+version: 0.1.1
 appVersion: "stable"
+annotations:
+  artifacthub.io/images: |
+    - name: zaproxy
+      image: ghcr.io/zaproxy/zaproxy:stable
 keywords:
   - zaproxy
   - zap
