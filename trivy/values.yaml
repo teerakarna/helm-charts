@@ -1,0 +1,120 @@
+# -- Workload type: job | cronjob
+workloadType: job
+
+# -- CronJob schedule (used only when workloadType=cronjob).
+schedule: "0 3 * * *"
+
+# -- CronJob concurrency policy. Forbid prevents overlapping scans.
+concurrencyPolicy: Forbid
+
+# -- Number of failed CronJob runs to retain.
+failedJobsHistoryLimit: 3
+
+# -- Number of successful CronJob runs to retain.
+successfulJobsHistoryLimit: 1
+
+# -- Number of retries before marking the Job as failed.
+backoffLimit: 0
+
+# -- Maximum seconds a Job may run before being terminated (0 = no limit).
+activeDeadlineSeconds: 0
+
+image:
+  # -- Official Trivy image from Aqua Security.
+  repository: aquasec/trivy
+  pullPolicy: IfNotPresent
+  # -- Pin to a specific release in production.
+  tag: "0.58.1"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+rbac:
+  # -- Create a ClusterRole so Trivy can enumerate cluster workloads.
+  # Only needed when scanType=k8s.
+  create: false
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  # Trivy writes the vulnerability database to a temp dir on first run.
+  # Set readOnlyRootFilesystem: true only after confirming DB caching is disabled or mounted.
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+      - ALL
+
+# -- Scan type: image | fs | repo | k8s
+# image: scan a container image reference (e.g. nginx:latest)
+# fs:    scan a filesystem path — mount your volume via extraVolumes/extraVolumeMounts
+# repo:  scan a remote git repository URL
+# k8s:   scan the entire Kubernetes cluster (requires rbac.create=true)
+scanType: image
+
+# -- Target to scan.
+# image: image reference (e.g. nginx:latest, myregistry/myimage:tag)
+# fs:    filesystem path mounted into the container (e.g. /workspace)
+# repo:  git repository URL
+# k8s:   "cluster" or a specific namespace/resource
+target: "nginx:latest"
+
+# -- Severity levels to report: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
+severity: "HIGH,CRITICAL"
+
+# -- Output format: table | json | sarif | cyclonedx
+format: table
+
+# -- Vulnerability types to scan: os,library
+vulnType: "os,library"
+
+# -- Scanners to run: vuln,secret,misconfig (comma-separated)
+scanners: "vuln"
+
+# -- Ignore vulnerabilities without a fix.
+ignoreUnfixed: true
+
+# -- Exit code when vulnerabilities are found.
+# 0 = Job completes regardless of findings (recommended for scheduled scans).
+# 1 = Job fails if any findings match the severity filter.
+exitCode: 0
+
+# -- Skip downloading the vulnerability database (use cached DB only).
+skipUpdate: false
+
+# -- Persistent storage for scan reports.
+# When enabled, Trivy writes results to --output <mountPath>/report.<format>.
+persistence:
+  enabled: false
+  size: 500Mi
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  # -- Use an existing PVC instead of creating one.
+  existingClaim: ""
+  mountPath: /reports
+
+resources:
+  limits:
+    cpu: "1"
+    memory: 1Gi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

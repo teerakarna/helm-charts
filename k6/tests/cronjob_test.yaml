@@ -1,0 +1,59 @@
+suite: cronjob
+templates:
+  - cronjob.yaml
+tests:
+  - it: should not create a CronJob by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should create a CronJob when workloadType=cronjob
+    set:
+      workloadType: cronjob
+    asserts:
+      - isKind:
+          of: CronJob
+      - equal:
+          path: spec.schedule
+          value: "0 6 * * 1"
+      - equal:
+          path: spec.concurrencyPolicy
+          value: Forbid
+      - equal:
+          path: spec.jobTemplate.spec.backoffLimit
+          value: 0
+
+  - it: should include 'run' as first arg in cronjob
+    set:
+      workloadType: cronjob
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args[0]
+          value: run
+
+  - it: should include /scripts/test.js as last arg in cronjob
+    set:
+      workloadType: cronjob
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args[-1]
+          value: /scripts/test.js
+
+  - it: should set restartPolicy to Never in cronjob
+    set:
+      workloadType: cronjob
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.restartPolicy
+          value: Never
+
+  - it: should enforce security context in cronjob
+    set:
+      workloadType: cronjob
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.securityContext.runAsNonRoot
+          value: true
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation
+          value: false

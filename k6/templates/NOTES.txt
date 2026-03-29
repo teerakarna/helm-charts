@@ -1,0 +1,26 @@
+k6 load test is configured.
+
+Workload: {{ .Values.workloadType | upper }}
+{{- if eq .Values.workloadType "cronjob" }}
+Schedule: {{ .Values.schedule }}
+
+Trigger a test run immediately:
+  kubectl create job --from=cronjob/{{ include "k6.fullname" . }} \
+    {{ include "k6.fullname" . }}-manual \
+    -n {{ .Release.Namespace }}
+{{- end }}
+
+Check test status:
+  kubectl get jobs -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }}
+
+View test results:
+  kubectl logs -n {{ .Release.Namespace }} \
+    -l app.kubernetes.io/instance={{ .Release.Name }} --tail=100
+
+Update the test script without reinstalling:
+  helm upgrade {{ .Release.Name }} teerakarna/k6 \
+    --set-file script=./my-test.js \
+    -n {{ .Release.Namespace }}
+
+Delete when done (Job mode only):
+  helm uninstall {{ .Release.Name }} --namespace {{ .Release.Namespace }}

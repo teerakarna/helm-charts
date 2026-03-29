@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "toxiproxy.fullname" . }}
+  labels:
+    {{- include "toxiproxy.labels" . | nindent 4 }}
+data:
+  config.json: |
+{{ .Values.proxies | toPrettyJson | indent 4 }}

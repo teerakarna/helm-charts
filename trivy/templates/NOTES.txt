@@ -1,0 +1,34 @@
+Trivy is scanning: {{ .Values.target }}
+Scan type: {{ .Values.scanType | upper }}
+Severity filter: {{ .Values.severity }}
+
+Workload: {{ .Values.workloadType | upper }}
+{{- if eq .Values.workloadType "cronjob" }}
+Schedule: {{ .Values.schedule }}
+
+Trigger a scan immediately:
+  kubectl create job --from=cronjob/{{ include "trivy.fullname" . }} \
+    {{ include "trivy.fullname" . }}-manual \
+    -n {{ .Release.Namespace }}
+{{- end }}
+
+Check scan status:
+  kubectl get jobs -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }}
+
+View scan logs:
+  kubectl logs -n {{ .Release.Namespace }} \
+    -l app.kubernetes.io/instance={{ .Release.Name }} --tail=100
+{{- if .Values.persistence.enabled }}
+
+View report (mount the PVC in a debug pod):
+  helm install debug teerakarna/sleep -n {{ .Release.Namespace }} \
+    --set 'volumes[0].name=reports' \
+    --set 'volumes[0].persistentVolumeClaim.claimName={{ include "trivy.pvcName" . }}'
+  kubectl exec -it -n {{ .Release.Namespace }} \
+    $(kubectl get pod -n {{ .Release.Namespace }} -l app.kubernetes.io/instance=debug -o jsonpath="{.items[0].metadata.name}") \
+    -- sh
+  # Inside the pod: ls {{ .Values.persistence.mountPath }}
+{{- end }}
+
+Delete when done (Job mode only):
+  helm uninstall {{ .Release.Name }} --namespace {{ .Release.Namespace }}

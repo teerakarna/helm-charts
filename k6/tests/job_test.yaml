@@ -1,0 +1,88 @@
+suite: job
+templates:
+  - job.yaml
+  - configmap.yaml
+tests:
+  - it: should create a Job by default
+    template: job.yaml
+    asserts:
+      - isKind:
+          of: Job
+      - equal:
+          path: spec.backoffLimit
+          value: 0
+
+  - it: should not create a Job when workloadType=cronjob
+    template: job.yaml
+    set:
+      workloadType: cronjob
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should include 'run' as first arg
+    template: job.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].args[0]
+          value: run
+
+  - it: should include /scripts/test.js as last arg
+    template: job.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].args[-1]
+          value: /scripts/test.js
+
+  - it: should pass env vars as --env flags
+    template: job.yaml
+    set:
+      env:
+        TARGET_URL: "http://my-service/"
+        SOME_VAR: "value"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --env
+
+  - it: should mount the scripts configmap
+    template: job.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[0].configMap.name
+          value: RELEASE-NAME-k6
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[0].mountPath
+          value: /scripts
+
+  - it: should set restartPolicy to Never
+    template: job.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.restartPolicy
+          value: Never
+
+  - it: should set automountServiceAccountToken to false
+    template: job.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: false
+
+  - it: should enforce security context
+    template: job.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsNonRoot
+          value: true
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation
+          value: false
+
+  - it: should create a ConfigMap with the test script
+    template: configmap.yaml
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - isNotEmpty:
+          path: data["test.js"]

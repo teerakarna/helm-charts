@@ -1,0 +1,26 @@
+{{- if eq .Values.workloadType "job" -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "k6.fullname" . }}
+  labels:
+    {{- include "k6.labels" . | nindent 4 }}
+  {{- with .Values.podAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  backoffLimit: {{ .Values.backoffLimit }}
+  {{- if .Values.activeDeadlineSeconds }}
+  activeDeadlineSeconds: {{ .Values.activeDeadlineSeconds }}
+  {{- end }}
+  template:
+    metadata:
+      labels:
+        {{- include "k6.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- include "k6.podSpec" . | nindent 6 }}
+{{- end }}

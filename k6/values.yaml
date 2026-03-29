@@ -1,0 +1,96 @@
+# -- Workload type: job | cronjob
+workloadType: job
+
+# -- CronJob schedule (used only when workloadType=cronjob).
+schedule: "0 6 * * 1"
+
+# -- CronJob concurrency policy. Forbid prevents overlapping load tests.
+concurrencyPolicy: Forbid
+
+# -- Number of failed CronJob runs to retain.
+failedJobsHistoryLimit: 3
+
+# -- Number of successful CronJob runs to retain.
+successfulJobsHistoryLimit: 3
+
+# -- Number of retries before marking the Job as failed.
+backoffLimit: 0
+
+# -- Maximum seconds a Job may run before being terminated (0 = no limit).
+activeDeadlineSeconds: 0
+
+image:
+  # -- Official Grafana k6 image.
+  repository: grafana/k6
+  pullPolicy: IfNotPresent
+  # -- Image tag. Defaults to Chart.AppVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+# -- Environment variables passed to the k6 script via --env KEY=VALUE.
+# Reference them in your script with __ENV.KEY.
+# Example:
+#   env:
+#     TARGET_URL: "http://my-service.my-namespace.svc.cluster.local"
+#     EXPECTED_STATUS: "200"
+env:
+  TARGET_URL: "http://example.com"
+
+# -- k6 JavaScript test script.
+# Mounted as a ConfigMap at /scripts/test.js.
+# The script has full access to environment variables via __ENV.
+script: |
+  import http from 'k6/http';
+  import { check, sleep } from 'k6';
+
+  export const options = {
+    vus: 10,
+    duration: '30s',
+    thresholds: {
+      http_req_failed: ['rate<0.01'],
+      http_req_duration: ['p(95)<500'],
+    },
+  };
+
+  export default function () {
+    const res = http.get(__ENV.TARGET_URL);
+    check(res, { 'status was 200': (r) => r.status === 200 });
+    sleep(1);
+  }
+
+resources:
+  limits:
+    cpu: "1"
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 64Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

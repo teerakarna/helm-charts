@@ -1,0 +1,23 @@
+Toxiproxy is running with {{ len .Values.proxies }} proxy(s).
+
+Access the API:
+  kubectl port-forward -n {{ .Release.Namespace }} \
+    svc/{{ include "toxiproxy.fullname" . }} {{ .Values.service.apiPort }}:{{ .Values.service.apiPort }}
+
+  # List proxies
+  curl http://localhost:{{ .Values.service.apiPort }}/proxies
+
+  # Add a latency toxic to a proxy
+  curl -X POST http://localhost:{{ .Values.service.apiPort }}/proxies/<name>/toxics \
+    -d '{"name":"latency","type":"latency","attributes":{"latency":100,"jitter":10}}'
+
+  # Remove a toxic
+  curl -X DELETE http://localhost:{{ .Values.service.apiPort }}/proxies/<name>/toxics/latency
+
+Configured proxies:
+{{- range .Values.proxies }}
+  - {{ .name }}: {{ .listen }} → {{ .upstream }}
+{{- end }}
+
+For a complete list of available toxics (latency, bandwidth, slow_close, timeout, slicer, etc.):
+  https://github.com/Shopify/toxiproxy#toxics

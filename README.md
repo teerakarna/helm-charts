@@ -24,6 +24,9 @@ helm repo update
 | [kube-hunter](./kube-hunter/) | Kubernetes penetration testing (kube-hunter) — hunt for security weaknesses in-cluster | 0.1.0 |
 | [gonymizer](./gonymizer/) | PostgreSQL data anonymization (Gonymizer) — dump, anonymize, and reload PII/PHI for QA | 0.1.0 |
 | [bombardier](./bombardier/) | Fast HTTP/S load testing (bombardier) — Job/CronJob to benchmark in-cluster services | 0.1.0 |
+| [trivy](./trivy/) | Vulnerability scanner (Trivy) — Job/CronJob to scan images, filesystems, or entire clusters | 0.1.0 |
+| [k6](./k6/) | Scriptable load testing (Grafana k6) — Job/CronJob with a ConfigMap-mounted JS test script | 0.1.0 |
+| [toxiproxy](./toxiproxy/) | Network fault injection proxy (Toxiproxy) — Deployment to inject latency, packet loss, and timeouts | 0.1.0 |
 
 ## Usage
 
@@ -67,6 +70,27 @@ helm install load teerakarna/bombardier \
   --set image.repository=ghcr.io/YOUR_USERNAME/bombardier \
   --set target.url=http://echo-echoserver.default.svc.cluster.local/
 kubectl logs -l app.kubernetes.io/instance=load
+
+# Vulnerability scan — scan an image for HIGH/CRITICAL CVEs
+helm install scan teerakarna/trivy \
+  --set target=nginx:latest
+kubectl logs -l app.kubernetes.io/instance=scan
+
+# Scriptable load test — run a k6 JS script against an in-cluster service
+helm install k6 teerakarna/k6 \
+  --set env.TARGET_URL=http://echo-echoserver.default.svc.cluster.local/
+kubectl logs -l app.kubernetes.io/instance=k6
+
+# Network fault injection — wrap a service with Toxiproxy for chaos testing
+helm install toxi teerakarna/toxiproxy \
+  --set 'proxies[0].name=redis' \
+  --set 'proxies[0].listen=0.0.0.0:26379' \
+  --set 'proxies[0].upstream=redis-master.default.svc.cluster.local:6379' \
+  --set 'proxies[0].enabled=true'
+# Add latency via the API:
+kubectl port-forward svc/toxi-toxiproxy 8474:8474
+curl -X POST http://localhost:8474/proxies/redis/toxics \
+  -d '{"name":"latency","type":"latency","attributes":{"latency":100}}'
 ```
 
 ## Development

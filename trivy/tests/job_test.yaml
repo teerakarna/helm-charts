@@ -1,0 +1,112 @@
+suite: job
+templates:
+  - job.yaml
+tests:
+  - it: should create a Job by default
+    asserts:
+      - isKind:
+          of: Job
+      - equal:
+          path: spec.backoffLimit
+          value: 0
+
+  - it: should not create a Job when workloadType=cronjob
+    set:
+      workloadType: cronjob
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should include the scan type as first arg
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].args[0]
+          value: image
+
+  - it: should include --severity flag
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --severity
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: "HIGH,CRITICAL"
+
+  - it: should include --format flag
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --format
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: table
+
+  - it: should include --ignore-unfixed by default
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --ignore-unfixed
+
+  - it: should not include --ignore-unfixed when ignoreUnfixed=false
+    set:
+      ignoreUnfixed: false
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].args
+          content: --ignore-unfixed
+
+  - it: should include target as last arg
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].args[-1]
+          value: "nginx:latest"
+
+  - it: should set restartPolicy to Never
+    asserts:
+      - equal:
+          path: spec.template.spec.restartPolicy
+          value: Never
+
+  - it: should set automountServiceAccountToken to false when rbac is disabled
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: false
+
+  - it: should set automountServiceAccountToken to true when rbac is enabled
+    set:
+      rbac.create: true
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: true
+
+  - it: should enforce security context
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsNonRoot
+          value: true
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation
+          value: false
+
+  - it: should not mount a volume when persistence is disabled
+    asserts:
+      - isNull:
+          path: spec.template.spec.volumes
+
+  - it: should mount PVC when persistence is enabled
+    set:
+      persistence.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[0].persistentVolumeClaim.claimName
+          value: RELEASE-NAME-trivy
+
+  - it: should include --output when persistence is enabled
+    set:
+      persistence.enabled: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --output

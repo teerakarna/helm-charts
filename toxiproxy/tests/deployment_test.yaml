@@ -1,0 +1,109 @@
+suite: deployment
+templates:
+  - deployment.yaml
+  - configmap.yaml
+  - service.yaml
+tests:
+  - it: should create a Deployment
+    template: deployment.yaml
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.replicas
+          value: 1
+
+  - it: should expose the API port
+    template: deployment.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].ports
+          content:
+            name: api
+            containerPort: 8474
+            protocol: TCP
+
+  - it: should expose proxy ports from the proxies list
+    template: deployment.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].ports
+          content:
+            name: example
+            containerPort: 22000
+            protocol: TCP
+
+  - it: should pass the config file arg
+    template: deployment.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].args[0]
+          value: -config
+      - equal:
+          path: spec.template.spec.containers[0].args[1]
+          value: /etc/toxiproxy/config.json
+
+  - it: should mount the config ConfigMap
+    template: deployment.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[0].configMap.name
+          value: RELEASE-NAME-toxiproxy
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[0].mountPath
+          value: /etc/toxiproxy/config.json
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[0].subPath
+          value: config.json
+
+  - it: should set automountServiceAccountToken to false
+    template: deployment.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: false
+
+  - it: should enforce security context
+    template: deployment.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsNonRoot
+          value: true
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation
+          value: false
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem
+          value: true
+
+  - it: should create a ConfigMap with proxy config
+    template: configmap.yaml
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - isNotEmpty:
+          path: data["config.json"]
+
+  - it: should create a Service with api port
+    template: service.yaml
+    asserts:
+      - isKind:
+          of: Service
+      - contains:
+          path: spec.ports
+          content:
+            name: api
+            port: 8474
+            targetPort: api
+            protocol: TCP
+
+  - it: should create a Service with proxy ports
+    template: service.yaml
+    asserts:
+      - contains:
+          path: spec.ports
+          content:
+            name: example
+            port: 22000
+            targetPort: example
+            protocol: TCP

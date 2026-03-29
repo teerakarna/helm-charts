@@ -1,0 +1,20 @@
+apiVersion: v2
+name: trivy
+description: Container and filesystem vulnerability scanner (Trivy by Aqua Security). Runs as a Job or CronJob to scan images, filesystems, or entire Kubernetes clusters for vulnerabilities, misconfigurations, and secrets.
+type: application
+version: 0.1.0
+appVersion: "0.58.1"
+keywords:
+  - trivy
+  - security
+  - vulnerability
+  - scanning
+  - containers
+  - kubernetes
+home: https://github.com/teerakarna/helm-charts
+sources:
+  - https://github.com/teerakarna/helm-charts
+  - https://github.com/aquasecurity/trivy
+maintainers:
+  - name: teerakarna
+    url: https://github.com/teerakarna

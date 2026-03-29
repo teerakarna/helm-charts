@@ -1,0 +1,85 @@
+replicaCount: 1
+
+image:
+  # -- Official Toxiproxy image from Shopify.
+  repository: ghcr.io/shopify/toxiproxy
+  pullPolicy: IfNotPresent
+  # -- Image tag. Defaults to Chart.AppVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+# -- Proxy definitions loaded from config.json on startup.
+# Use the Toxiproxy API (port 8474) at runtime to add toxics (latency, packet loss, etc.).
+#
+# name:     unique identifier used by the API to reference this proxy
+# listen:   address Toxiproxy binds on — use 0.0.0.0:<port> to expose via Service
+# upstream: backend to forward traffic to (host:port)
+# enabled:  whether the proxy accepts connections on startup
+#
+# Example — wrap a Redis instance:
+#   proxies:
+#     - name: redis
+#       listen: "0.0.0.0:26379"
+#       upstream: "redis-master.default.svc.cluster.local:6379"
+#       enabled: true
+proxies:
+  - name: example
+    listen: "0.0.0.0:22000"
+    upstream: "example.com:80"
+    enabled: true
+
+service:
+  type: ClusterIP
+  # -- Port for the Toxiproxy REST API (list proxies, add/remove toxics).
+  apiPort: 8474
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 64Mi
+  requests:
+    cpu: 50m
+    memory: 32Mi
+
+livenessProbe:
+  httpGet:
+    path: /proxies
+    port: api
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /proxies
+    port: api
+  initialDelaySeconds: 3
+  periodSeconds: 5
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
