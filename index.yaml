@@ -107,6 +107,35 @@ entries:
     - https://github.com/teerakarna/helm-charts/releases/download/gonymizer-0.1.0/gonymizer-0.1.0.tgz
     version: 0.1.0
   k6:
+  - annotations:
+      artifacthub.io/images: |
+        - name: k6
+          image: grafana/k6:1.7.0
+    apiVersion: v2
+    appVersion: 1.7.0
+    created: "2026-03-29T04:04:03.622746302Z"
+    description: Scriptable HTTP/S load testing tool (Grafana k6). Runs a JavaScript
+      test script as a Job or CronJob to measure throughput, latency, and run custom
+      threshold assertions against in-cluster services.
+    digest: a86fa8e49ecd53859119bad230056fe0bdcb3ca0e2c2e41117a8a8c919109585
+    home: https://github.com/teerakarna/helm-charts
+    keywords:
+    - k6
+    - load-testing
+    - performance
+    - benchmarking
+    - http
+    maintainers:
+    - name: teerakarna
+      url: https://github.com/teerakarna
+    name: k6
+    sources:
+    - https://github.com/teerakarna/helm-charts
+    - https://github.com/grafana/k6
+    type: application
+    urls:
+    - https://github.com/teerakarna/helm-charts/releases/download/k6-0.2.0/k6-0.2.0.tgz
+    version: 0.2.0
   - apiVersion: v2
     appVersion: 0.55.0
     created: "2026-03-29T01:15:32.221923969Z"
@@ -317,6 +346,36 @@ entries:
     - https://github.com/teerakarna/helm-charts/releases/download/toxiproxy-0.1.0/toxiproxy-0.1.0.tgz
     version: 0.1.0
   trivy:
+  - annotations:
+      artifacthub.io/images: |
+        - name: trivy
+          image: aquasec/trivy:0.69.3
+    apiVersion: v2
+    appVersion: 0.69.3
+    created: "2026-03-29T04:04:03.731188316Z"
+    description: Container and filesystem vulnerability scanner (Trivy by Aqua Security).
+      Runs as a Job or CronJob to scan images, filesystems, or entire Kubernetes clusters
+      for vulnerabilities, misconfigurations, and secrets.
+    digest: fafe7e77672d216e7bc578545c1e0dcec39dbfdd151789262f51ae9695045f50
+    home: https://github.com/teerakarna/helm-charts
+    keywords:
+    - trivy
+    - security
+    - vulnerability
+    - scanning
+    - containers
+    - kubernetes
+    maintainers:
+    - name: teerakarna
+      url: https://github.com/teerakarna
+    name: trivy
+    sources:
+    - https://github.com/teerakarna/helm-charts
+    - https://github.com/aquasecurity/trivy
+    type: application
+    urls:
+    - https://github.com/teerakarna/helm-charts/releases/download/trivy-0.2.0/trivy-0.2.0.tgz
+    version: 0.2.0
   - apiVersion: v2
     appVersion: 0.58.1
     created: "2026-03-29T01:15:32.433653851Z"
@@ -370,4 +429,4 @@ entries:
     urls:
     - https://github.com/teerakarna/helm-charts/releases/download/zaproxy-0.1.0/zaproxy-0.1.0.tgz
     version: 0.1.0
-generated: "2026-03-29T03:51:35.836611287Z"
+generated: "2026-03-29T04:04:03.731203836Z"
