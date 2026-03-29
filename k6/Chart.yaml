@@ -2,8 +2,12 @@ apiVersion: v2
 name: k6
 description: Scriptable HTTP/S load testing tool (Grafana k6). Runs a JavaScript test script as a Job or CronJob to measure throughput, latency, and run custom threshold assertions against in-cluster services.
 type: application
-version: 0.1.0
-appVersion: "0.55.0"
+version: 0.2.0
+appVersion: "1.7.0"
+annotations:
+  artifacthub.io/images: |
+    - name: k6
+      image: grafana/k6:1.7.0
 keywords:
   - k6
   - load-testing

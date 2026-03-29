@@ -2,8 +2,12 @@ apiVersion: v2
 name: trivy
 description: Container and filesystem vulnerability scanner (Trivy by Aqua Security). Runs as a Job or CronJob to scan images, filesystems, or entire Kubernetes clusters for vulnerabilities, misconfigurations, and secrets.
 type: application
-version: 0.1.0
-appVersion: "0.58.1"
+version: 0.2.0
+appVersion: "0.69.3"
+annotations:
+  artifacthub.io/images: |
+    - name: trivy
+      image: aquasec/trivy:0.69.3
 keywords:
   - trivy
   - security

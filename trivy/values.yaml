@@ -24,7 +24,7 @@ image:
   repository: aquasec/trivy
   pullPolicy: IfNotPresent
   # -- Pin to a specific release in production.
-  tag: "0.58.1"
+  tag: "0.69.3"
 
 imagePullSecrets: []
 nameOverride: ""

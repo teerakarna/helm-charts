@@ -45,7 +45,7 @@ helm uninstall scan
 | `workloadType` | `job` or `cronjob` | `job` |
 | `schedule` | CronJob schedule | `0 3 * * *` |
 | `image.repository` | Image repository | `aquasec/trivy` |
-| `image.tag` | Image tag | `0.58.1` |
+| `image.tag` | Image tag | `0.69.3` |
 | `scanType` | Scan type: `image`, `fs`, `repo`, `k8s` | `image` |
 | `target` | Target to scan (image ref, path, URL, or `cluster`) | `nginx:latest` |
 | `severity` | Severity filter | `HIGH,CRITICAL` |
