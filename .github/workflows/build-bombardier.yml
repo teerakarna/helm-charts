@@ -44,7 +44,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build for scanning (amd64, local)
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: bombardier/docker
           platforms: linux/amd64
@@ -65,7 +65,7 @@ jobs:
 
       - name: Build and push (multi-arch)
         id: build
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: bombardier/docker
           platforms: linux/amd64,linux/arm64
