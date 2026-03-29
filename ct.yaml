@@ -1,5 +1,6 @@
 remote: origin
 chart-dirs:
   - .
-excluded-charts: []
+excluded-charts:
+  - .github
 helm-extra-args: --timeout 600s

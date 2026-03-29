@@ -7,3 +7,24 @@ updates:
       day: "monday"
     labels:
       - "dependencies"
+  - package-ecosystem: "docker"
+    directory: "/scoutsuite/docker"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+  - package-ecosystem: "docker"
+    directory: "/dbclient/docker"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+  - package-ecosystem: "docker"
+    directory: "/bombardier/docker"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
