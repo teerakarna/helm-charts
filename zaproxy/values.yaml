@@ -1,0 +1,118 @@
+# -- Workload type: job | cronjob
+workloadType: job
+
+# -- CronJob schedule (used only when workloadType=cronjob).
+schedule: "0 2 * * 1"
+
+# -- CronJob concurrency policy. Forbid prevents overlapping scans.
+concurrencyPolicy: Forbid
+
+# -- Number of failed CronJob runs to retain.
+failedJobsHistoryLimit: 3
+
+# -- Number of successful CronJob runs to retain.
+successfulJobsHistoryLimit: 1
+
+# -- Number of retries before marking the Job as failed.
+backoffLimit: 0
+
+# -- Maximum seconds a Job may run before being terminated (0 = no limit).
+# ZAP scans can run for a long time — set this to prevent runaway scans.
+activeDeadlineSeconds: 0
+
+image:
+  # -- Official ZAP image from the OWASP ZAP project.
+  repository: ghcr.io/zaproxy/zaproxy
+  pullPolicy: IfNotPresent
+  # -- 'stable' tracks the latest stable release. Pin to a version tag (e.g. 2.15.0) in production.
+  tag: "stable"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  # ZAP runs as user 'zap' (UID 1000) in the official image.
+  runAsUser: 1000
+  runAsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  # ZAP is JVM-based and writes session data, add-ons, and logs under /zap/ at runtime.
+  # readOnlyRootFilesystem cannot be set to true without mounting tmpfs for those paths.
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+      - ALL
+
+# -- Target URL to scan.
+# Injected into the automation plan as the TARGET_URL environment variable.
+# Reference it in your plan with ${TARGET_URL}.
+target:
+  url: "http://example.com"
+
+# -- ZAP Automation Framework plan (automation.yaml).
+# Mounted as a ConfigMap at /zap/wrk/automation.yaml.
+# The TARGET_URL environment variable is available via ${TARGET_URL}.
+#
+# Default plan: traditional spider + passive scan + HTML report.
+# To add an active scan, append a job of type 'activeScan' after passiveScan-wait.
+# Full Automation Framework reference: https://www.zaproxy.org/docs/desktop/addons/automation-framework/
+plan: |
+  env:
+    contexts:
+      - name: default
+        urls:
+          - "${TARGET_URL}"
+    parameters:
+      failOnError: true
+      failOnWarning: false
+      progressToStdout: true
+  jobs:
+    - type: spider
+      parameters:
+        context: default
+        maxDuration: 2
+    - type: passiveScan-wait
+      parameters:
+        maxDuration: 5
+    - type: report
+      parameters:
+        template: traditional-html
+        reportDir: /zap/wrk/reports
+        reportTitle: ZAP Scan Report
+
+# -- Persistent storage for scan reports.
+# When enabled, the reports directory in the plan should match persistence.mountPath.
+persistence:
+  enabled: false
+  size: 500Mi
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  # -- Use an existing PVC instead of creating one.
+  existingClaim: ""
+  mountPath: /zap/wrk/reports
+
+resources:
+  limits:
+    # ZAP is JVM-based. 2Gi is a reasonable minimum; increase for large applications.
+    cpu: "1"
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 1Gi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

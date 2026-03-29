@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "zaproxy.fullname" . }}
+  labels:
+    {{- include "zaproxy.labels" . | nindent 4 }}
+data:
+  automation.yaml: |
+{{ .Values.plan | indent 4 }}

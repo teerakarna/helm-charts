@@ -1,0 +1,113 @@
+suite: job
+templates:
+  - job.yaml
+  - configmap.yaml
+tests:
+  - it: should create a Job by default
+    template: job.yaml
+    asserts:
+      - isKind:
+          of: Job
+      - equal:
+          path: spec.backoffLimit
+          value: 0
+
+  - it: should not create a Job when workloadType=cronjob
+    template: job.yaml
+    set:
+      workloadType: cronjob
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should pass -cmd as first arg
+    template: job.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].args[0]
+          value: -cmd
+
+  - it: should pass -autorun as second arg
+    template: job.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].args[1]
+          value: -autorun
+
+  - it: should pass the automation plan path as third arg
+    template: job.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].args[2]
+          value: /zap/wrk/automation.yaml
+
+  - it: should inject TARGET_URL env var
+    template: job.yaml
+    set:
+      target.url: "http://my-service/"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: TARGET_URL
+            value: "http://my-service/"
+
+  - it: should mount the plan ConfigMap at the automation.yaml path
+    template: job.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[0].configMap.name
+          value: RELEASE-NAME-zaproxy
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[0].mountPath
+          value: /zap/wrk/automation.yaml
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[0].subPath
+          value: automation.yaml
+
+  - it: should use emptyDir for reports when persistence is disabled
+    template: job.yaml
+    asserts:
+      - exists:
+          path: spec.template.spec.volumes[1].emptyDir
+
+  - it: should use PVC for reports when persistence is enabled
+    template: job.yaml
+    set:
+      persistence.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[1].persistentVolumeClaim.claimName
+          value: RELEASE-NAME-zaproxy
+
+  - it: should set restartPolicy to Never
+    template: job.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.restartPolicy
+          value: Never
+
+  - it: should set automountServiceAccountToken to false
+    template: job.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: false
+
+  - it: should enforce security context
+    template: job.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsNonRoot
+          value: true
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation
+          value: false
+
+  - it: should create a ConfigMap with the automation plan
+    template: configmap.yaml
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - isNotEmpty:
+          path: data["automation.yaml"]

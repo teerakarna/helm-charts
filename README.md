@@ -27,6 +27,7 @@ helm repo update
 | [trivy](./trivy/) | Vulnerability scanner (Trivy) — Job/CronJob to scan images, filesystems, or entire clusters | 0.1.0 |
 | [k6](./k6/) | Scriptable load testing (Grafana k6) — Job/CronJob with a ConfigMap-mounted JS test script | 0.1.0 |
 | [toxiproxy](./toxiproxy/) | Network fault injection proxy (Toxiproxy) — Deployment to inject latency, packet loss, and timeouts | 0.1.0 |
+| [zaproxy](./zaproxy/) | Web application security scanner (OWASP ZAP) — Job/CronJob with Automation Framework plan | 0.1.0 |
 
 ## Usage
 
@@ -80,6 +81,11 @@ kubectl logs -l app.kubernetes.io/instance=scan
 helm install k6 teerakarna/k6 \
   --set env.TARGET_URL=http://echo-echoserver.default.svc.cluster.local/
 kubectl logs -l app.kubernetes.io/instance=k6
+
+# DAST scan — spider and passive-scan a service with OWASP ZAP
+helm install zap teerakarna/zaproxy \
+  --set target.url=http://echo-echoserver.default.svc.cluster.local/
+kubectl logs -l app.kubernetes.io/instance=zap -f
 
 # Network fault injection — wrap a service with Toxiproxy for chaos testing
 helm install toxi teerakarna/toxiproxy \
