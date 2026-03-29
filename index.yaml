@@ -313,4 +313,31 @@ entries:
     urls:
     - https://github.com/teerakarna/helm-charts/releases/download/trivy-0.1.0/trivy-0.1.0.tgz
     version: 0.1.0
-generated: "2026-03-29T01:15:32.433659982Z"
+  zaproxy:
+  - apiVersion: v2
+    appVersion: stable
+    created: "2026-03-29T02:22:19.54361214Z"
+    description: Web application security scanner (OWASP ZAP). Runs an Automation
+      Framework plan as a Job or CronJob to spider and scan in-cluster services for
+      vulnerabilities.
+    digest: 35cd33a5ab1e8bac2393a9323b9dec7628309696e47cbaacc8ab7ff8c94c3113
+    home: https://github.com/teerakarna/helm-charts
+    keywords:
+    - zaproxy
+    - zap
+    - owasp
+    - security
+    - scanning
+    - dast
+    maintainers:
+    - name: teerakarna
+      url: https://github.com/teerakarna
+    name: zaproxy
+    sources:
+    - https://github.com/teerakarna/helm-charts
+    - https://github.com/zaproxy/zaproxy
+    type: application
+    urls:
+    - https://github.com/teerakarna/helm-charts/releases/download/zaproxy-0.1.0/zaproxy-0.1.0.tgz
+    version: 0.1.0
+generated: "2026-03-29T02:22:19.543619133Z"
