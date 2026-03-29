@@ -133,6 +133,36 @@ entries:
     - https://github.com/teerakarna/helm-charts/releases/download/k6-0.1.0/k6-0.1.0.tgz
     version: 0.1.0
   kube-bench:
+  - annotations:
+      artifacthub.io/images: |
+        - name: kube-bench
+          image: aquasec/kube-bench:v0.15.0
+    apiVersion: v2
+    appVersion: 0.15.0
+    created: "2026-03-29T03:51:35.544446052Z"
+    description: CIS Kubernetes Benchmark auditing tool (kube-bench by Aqua Security).
+      Runs as a Job or CronJob to check whether Kubernetes is deployed according to
+      CIS security best practices.
+    digest: 49094a9ca52ee916db935901be9ff52c084dcda6427b1fa800db5e53aeaff392
+    home: https://github.com/teerakarna/helm-charts
+    keywords:
+    - kube-bench
+    - security
+    - cis
+    - benchmark
+    - auditing
+    - kubernetes
+    maintainers:
+    - name: teerakarna
+      url: https://github.com/teerakarna
+    name: kube-bench
+    sources:
+    - https://github.com/teerakarna/helm-charts
+    - https://github.com/aquasecurity/kube-bench
+    type: application
+    urls:
+    - https://github.com/teerakarna/helm-charts/releases/download/kube-bench-0.2.0/kube-bench-0.2.0.tgz
+    version: 0.2.0
   - apiVersion: v2
     appVersion: 0.8.0
     created: "2026-03-28T20:22:50.56564221Z"
@@ -340,4 +370,4 @@ entries:
     urls:
     - https://github.com/teerakarna/helm-charts/releases/download/zaproxy-0.1.0/zaproxy-0.1.0.tgz
     version: 0.1.0
-generated: "2026-03-29T02:22:19.543619133Z"
+generated: "2026-03-29T03:51:35.836611287Z"
