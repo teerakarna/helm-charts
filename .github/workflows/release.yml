@@ -48,9 +48,16 @@ jobs:
           fi
           for pkg in "${packages[@]}"; do
             bundle="${pkg}.bundle"
+            release_tag=$(basename "$pkg" .tgz)
+            bundle_name=$(basename "$bundle")
+            # Skip if the bundle asset already exists on the release (e.g. concurrent runs).
+            if gh release view "$release_tag" --repo "$GITHUB_REPOSITORY" --json assets \
+                 --jq --arg n "$bundle_name" '.assets[].name | select(. == $n)' | grep -q .; then
+              echo "Bundle already present on release ${release_tag} — skipping"
+              continue
+            fi
             echo "Signing ${pkg}"
             cosign sign-blob --bundle "$bundle" --yes "$pkg"
-            release_tag=$(basename "$pkg" .tgz)
             gh release upload "$release_tag" "$bundle" \
               --repo "$GITHUB_REPOSITORY" \
               --clobber
