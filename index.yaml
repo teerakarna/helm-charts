@@ -106,6 +106,32 @@ entries:
     urls:
     - https://github.com/teerakarna/helm-charts/releases/download/gonymizer-0.1.0/gonymizer-0.1.0.tgz
     version: 0.1.0
+  k6:
+  - apiVersion: v2
+    appVersion: 0.55.0
+    created: "2026-03-29T01:15:32.221923969Z"
+    description: Scriptable HTTP/S load testing tool (Grafana k6). Runs a JavaScript
+      test script as a Job or CronJob to measure throughput, latency, and run custom
+      threshold assertions against in-cluster services.
+    digest: ab479ccc16d8f650b1b475952968b9624087c66d24a3ad8bc7db09ec5e7a7fea
+    home: https://github.com/teerakarna/helm-charts
+    keywords:
+    - k6
+    - load-testing
+    - performance
+    - benchmarking
+    - http
+    maintainers:
+    - name: teerakarna
+      url: https://github.com/teerakarna
+    name: k6
+    sources:
+    - https://github.com/teerakarna/helm-charts
+    - https://github.com/grafana/k6
+    type: application
+    urls:
+    - https://github.com/teerakarna/helm-charts/releases/download/k6-0.1.0/k6-0.1.0.tgz
+    version: 0.1.0
   kube-bench:
   - apiVersion: v2
     appVersion: 0.8.0
@@ -233,4 +259,58 @@ entries:
     urls:
     - https://github.com/teerakarna/helm-charts/releases/download/sleep-0.1.0/sleep-0.1.0.tgz
     version: 0.1.0
-generated: "2026-03-28T20:22:50.675996422Z"
+  toxiproxy:
+  - apiVersion: v2
+    appVersion: 2.9.0
+    created: "2026-03-29T01:15:32.328963082Z"
+    description: Network fault injection proxy (Shopify Toxiproxy). Deploys a configurable
+      TCP proxy that can inject latency, packet loss, bandwidth limits, and timeouts
+      for resilience and chaos testing of in-cluster services.
+    digest: 1bd089422e076220ba23d6ef9106b604c04098263ac2f560ada2239d2669a957
+    home: https://github.com/teerakarna/helm-charts
+    keywords:
+    - toxiproxy
+    - chaos
+    - resilience
+    - network
+    - fault-injection
+    - testing
+    maintainers:
+    - name: teerakarna
+      url: https://github.com/teerakarna
+    name: toxiproxy
+    sources:
+    - https://github.com/teerakarna/helm-charts
+    - https://github.com/Shopify/toxiproxy
+    type: application
+    urls:
+    - https://github.com/teerakarna/helm-charts/releases/download/toxiproxy-0.1.0/toxiproxy-0.1.0.tgz
+    version: 0.1.0
+  trivy:
+  - apiVersion: v2
+    appVersion: 0.58.1
+    created: "2026-03-29T01:15:32.433653851Z"
+    description: Container and filesystem vulnerability scanner (Trivy by Aqua Security).
+      Runs as a Job or CronJob to scan images, filesystems, or entire Kubernetes clusters
+      for vulnerabilities, misconfigurations, and secrets.
+    digest: 311a1698dd2c3ba027b4566166982520d123f889a84d30a63bb644a90fe071d3
+    home: https://github.com/teerakarna/helm-charts
+    keywords:
+    - trivy
+    - security
+    - vulnerability
+    - scanning
+    - containers
+    - kubernetes
+    maintainers:
+    - name: teerakarna
+      url: https://github.com/teerakarna
+    name: trivy
+    sources:
+    - https://github.com/teerakarna/helm-charts
+    - https://github.com/aquasecurity/trivy
+    type: application
+    urls:
+    - https://github.com/teerakarna/helm-charts/releases/download/trivy-0.1.0/trivy-0.1.0.tgz
+    version: 0.1.0
+generated: "2026-03-29T01:15:32.433659982Z"
