@@ -53,6 +53,34 @@ entries:
     - https://github.com/teerakarna/helm-charts/releases/download/dbclient-0.1.0/dbclient-0.1.0.tgz
     version: 0.1.0
   echoserver:
+  - annotations:
+      artifacthub.io/images: |
+        - name: echoserver
+          image: registry.k8s.io/echoserver:1.10
+    apiVersion: v2
+    appVersion: "1.10"
+    created: "2026-03-29T04:32:15.571480163Z"
+    description: HTTP echo server for testing ingress controllers, load balancers,
+      and network policies in Kubernetes. Returns request headers, body, and environment
+      info.
+    digest: 1eec16bf4c57f0ed474efd3bc55eab9008a8342a9236dc828c31084a6a954f41
+    home: https://github.com/teerakarna/helm-charts
+    keywords:
+    - echoserver
+    - testing
+    - debugging
+    - networking
+    maintainers:
+    - name: teerakarna
+      url: https://github.com/teerakarna
+    name: echoserver
+    sources:
+    - https://github.com/teerakarna/helm-charts
+    - https://github.com/kubernetes/kubernetes/tree/master/test/images/echoserver
+    type: application
+    urls:
+    - https://github.com/teerakarna/helm-charts/releases/download/echoserver-0.2.1/echoserver-0.2.1.tgz
+    version: 0.2.1
   - apiVersion: v2
     appVersion: "1.10"
     created: "2026-03-29T00:28:27.157007+07:00"
@@ -78,6 +106,38 @@ entries:
     - https://github.com/teerakarna/helm-charts/releases/download/echoserver-0.2.0/echoserver-0.2.0.tgz
     version: 0.2.0
   gonymizer:
+  - annotations:
+      artifacthub.io/images: |
+        - name: gonymizer
+          image: smithoss/gonymizer:latest
+    apiVersion: v2
+    appVersion: latest
+    created: "2026-03-29T04:32:15.710847247Z"
+    description: PostgreSQL data anonymization tool (Gonymizer by SmithRx). Runs as
+      a CronJob or one-off Job to dump, anonymize, and optionally reload a PostgreSQL
+      database — replacing PII/PHI with realistic fake data for use in QA and testing
+      environments.
+    digest: 9b65cae3b8a319a6fdcb21f65ef40a45c3c02d4e845a3720bfdb12b2d6f91b44
+    home: https://github.com/teerakarna/helm-charts
+    keywords:
+    - gonymizer
+    - anonymization
+    - postgresql
+    - pii
+    - hipaa
+    - gdpr
+    - testing
+    maintainers:
+    - name: teerakarna
+      url: https://github.com/teerakarna
+    name: gonymizer
+    sources:
+    - https://github.com/teerakarna/helm-charts
+    - https://github.com/smithoss/gonymizer
+    type: application
+    urls:
+    - https://github.com/teerakarna/helm-charts/releases/download/gonymizer-0.1.1/gonymizer-0.1.1.tgz
+    version: 0.1.1
   - apiVersion: v2
     appVersion: latest
     created: "2026-03-28T19:30:09.585542172Z"
@@ -219,6 +279,33 @@ entries:
     - https://github.com/teerakarna/helm-charts/releases/download/kube-bench-0.1.0/kube-bench-0.1.0.tgz
     version: 0.1.0
   kube-hunter:
+  - annotations:
+      artifacthub.io/images: |
+        - name: kube-hunter
+          image: aquasec/kube-hunter:latest
+    apiVersion: v2
+    appVersion: latest
+    created: "2026-03-29T04:32:16.071399041Z"
+    description: Kubernetes penetration testing tool (kube-hunter by Aqua Security).
+      Runs as a Job or CronJob to hunt for security weaknesses in Kubernetes clusters.
+    digest: 45ddde5ea5284d974167374889f845de75d387746739568ecdc295c4f8542a4b
+    home: https://github.com/teerakarna/helm-charts
+    keywords:
+    - kube-hunter
+    - security
+    - penetration-testing
+    - kubernetes
+    maintainers:
+    - name: teerakarna
+      url: https://github.com/teerakarna
+    name: kube-hunter
+    sources:
+    - https://github.com/teerakarna/helm-charts
+    - https://github.com/aquasecurity/kube-hunter
+    type: application
+    urls:
+    - https://github.com/teerakarna/helm-charts/releases/download/kube-hunter-0.1.1/kube-hunter-0.1.1.tgz
+    version: 0.1.1
   - apiVersion: v2
     appVersion: latest
     created: "2026-03-28T20:22:50.675982926Z"
@@ -243,6 +330,34 @@ entries:
     - https://github.com/teerakarna/helm-charts/releases/download/kube-hunter-0.1.0/kube-hunter-0.1.0.tgz
     version: 0.1.0
   netshoot:
+  - annotations:
+      artifacthub.io/images: |
+        - name: netshoot
+          image: nicolaka/netshoot:latest
+    apiVersion: v2
+    appVersion: latest
+    created: "2026-03-29T04:32:16.190558415Z"
+    description: Network troubleshooting pod based on nicolaka/netshoot. Deploy into
+      any namespace and exec in to diagnose DNS, connectivity, routing, and network
+      policy issues.
+    digest: 1a994d3cce70625149f0cfe2d385540277a5d20df2c46ce08d8cbf706d77b5bc
+    home: https://github.com/teerakarna/helm-charts
+    keywords:
+    - netshoot
+    - debugging
+    - networking
+    - troubleshooting
+    maintainers:
+    - name: teerakarna
+      url: https://github.com/teerakarna
+    name: netshoot
+    sources:
+    - https://github.com/teerakarna/helm-charts
+    - https://github.com/nicolaka/netshoot
+    type: application
+    urls:
+    - https://github.com/teerakarna/helm-charts/releases/download/netshoot-0.1.1/netshoot-0.1.1.tgz
+    version: 0.1.1
   - apiVersion: v2
     appVersion: latest
     created: "2026-03-28T18:06:03.806317715Z"
@@ -296,6 +411,32 @@ entries:
     - https://github.com/teerakarna/helm-charts/releases/download/scoutsuite-0.1.0/scoutsuite-0.1.0.tgz
     version: 0.1.0
   sleep:
+  - annotations:
+      artifacthub.io/images: |
+        - name: sleep
+          image: alpine:3
+    apiVersion: v2
+    appVersion: "3"
+    created: "2026-03-29T04:32:16.366486506Z"
+    description: Minimal long-running pod for exec-based debugging. Deploys an Alpine
+      container that sleeps indefinitely — exec in to run commands from inside a namespace
+      without deploying a real application.
+    digest: 4cd00ac2ae89585b3611650d4a331002e873044b27e3fa8a28aeef266ad4b813
+    home: https://github.com/teerakarna/helm-charts
+    keywords:
+    - sleep
+    - debugging
+    - utility
+    maintainers:
+    - name: teerakarna
+      url: https://github.com/teerakarna
+    name: sleep
+    sources:
+    - https://github.com/teerakarna/helm-charts
+    type: application
+    urls:
+    - https://github.com/teerakarna/helm-charts/releases/download/sleep-0.1.1/sleep-0.1.1.tgz
+    version: 0.1.1
   - apiVersion: v2
     appVersion: "3"
     created: "2026-03-28T18:06:03.922963182Z"
@@ -319,6 +460,36 @@ entries:
     - https://github.com/teerakarna/helm-charts/releases/download/sleep-0.1.0/sleep-0.1.0.tgz
     version: 0.1.0
   toxiproxy:
+  - annotations:
+      artifacthub.io/images: |
+        - name: toxiproxy
+          image: ghcr.io/shopify/toxiproxy:2.9.0
+    apiVersion: v2
+    appVersion: 2.9.0
+    created: "2026-03-29T04:32:16.470465059Z"
+    description: Network fault injection proxy (Shopify Toxiproxy). Deploys a configurable
+      TCP proxy that can inject latency, packet loss, bandwidth limits, and timeouts
+      for resilience and chaos testing of in-cluster services.
+    digest: d32fb50162cd3c3ad0eeb7d1ec5963ef422a49fd6469cd3386f57e8e0c9ba266
+    home: https://github.com/teerakarna/helm-charts
+    keywords:
+    - toxiproxy
+    - chaos
+    - resilience
+    - network
+    - fault-injection
+    - testing
+    maintainers:
+    - name: teerakarna
+      url: https://github.com/teerakarna
+    name: toxiproxy
+    sources:
+    - https://github.com/teerakarna/helm-charts
+    - https://github.com/Shopify/toxiproxy
+    type: application
+    urls:
+    - https://github.com/teerakarna/helm-charts/releases/download/toxiproxy-0.1.1/toxiproxy-0.1.1.tgz
+    version: 0.1.1
   - apiVersion: v2
     appVersion: 2.9.0
     created: "2026-03-29T01:15:32.328963082Z"
@@ -435,6 +606,36 @@ entries:
     - https://github.com/teerakarna/helm-charts/releases/download/trivy-operator-0.1.0/trivy-operator-0.1.0.tgz
     version: 0.1.0
   zaproxy:
+  - annotations:
+      artifacthub.io/images: |
+        - name: zaproxy
+          image: ghcr.io/zaproxy/zaproxy:stable
+    apiVersion: v2
+    appVersion: stable
+    created: "2026-03-29T04:32:16.814708268Z"
+    description: Web application security scanner (OWASP ZAP). Runs an Automation
+      Framework plan as a Job or CronJob to spider and scan in-cluster services for
+      vulnerabilities.
+    digest: 0b6f7d09ca80c74a6f577333d498656524eefb00e48cd708f5bc4ad84fc2ee06
+    home: https://github.com/teerakarna/helm-charts
+    keywords:
+    - zaproxy
+    - zap
+    - owasp
+    - security
+    - scanning
+    - dast
+    maintainers:
+    - name: teerakarna
+      url: https://github.com/teerakarna
+    name: zaproxy
+    sources:
+    - https://github.com/teerakarna/helm-charts
+    - https://github.com/zaproxy/zaproxy
+    type: application
+    urls:
+    - https://github.com/teerakarna/helm-charts/releases/download/zaproxy-0.1.1/zaproxy-0.1.1.tgz
+    version: 0.1.1
   - apiVersion: v2
     appVersion: stable
     created: "2026-03-29T02:22:19.54361214Z"
@@ -461,4 +662,4 @@ entries:
     urls:
     - https://github.com/teerakarna/helm-charts/releases/download/zaproxy-0.1.0/zaproxy-0.1.0.tgz
     version: 0.1.0
-generated: "2026-03-29T04:19:51.101312233Z"
+generated: "2026-03-29T04:32:16.814747702Z"
